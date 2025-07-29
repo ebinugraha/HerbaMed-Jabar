@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">HerbaMed Jabar</string>
+    <string name="scan_tanaman">Scan Tanaman</string>
+    <string name="gambar_tanaman_yang_diambil">Gambar tanaman yang diambil</string>
+    <string name="nama_tanaman_akan_muncul_di_sini">Nama tanaman akan muncul di sini…</string>
+    <string name="tanaman_herbal">Tanaman Herbal:</string>
+    <string name="kegunaan">Kegunaan:</string>
+    <string name="deskripsi_dan_kegunaan_tanaman_akan_muncul_di_sini">Deskripsi dan kegunaan tanaman akan muncul di sini…</string>
+</resources>

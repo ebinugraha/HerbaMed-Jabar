@@ -6,4 +6,6 @@
     <string name="tanaman_herbal">Tanaman Herbal:</string>
     <string name="kegunaan">Kegunaan:</string>
     <string name="deskripsi_dan_kegunaan_tanaman_akan_muncul_di_sini">Deskripsi dan kegunaan tanaman akan muncul di sini…</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

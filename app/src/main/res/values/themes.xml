@@ -3,6 +3,8 @@
     <style name="Base.Theme.HerbaMedJabar" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- PERUBAHAN: Menambahkan baris ini untuk mengubah warna status bar -->
+        <item name="android:statusBarColor">@color/status_bar_dark</item>
     </style>
 
     <style name="Theme.HerbaMedJabar" parent="Base.Theme.HerbaMedJabar" />

@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import edu.unikom.herbamedjabar.UseCase.AnalyzePlantUseCase
+import edu.unikom.herbamedjabar.useCase.AnalyzePlantUseCase
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

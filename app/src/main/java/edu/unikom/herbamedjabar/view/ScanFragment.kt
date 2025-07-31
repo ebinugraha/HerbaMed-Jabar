@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.ai.client.generativeai.GenerativeModel
@@ -26,6 +27,10 @@ import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.viewModel.ScanViewModel
 import edu.unikom.herbamedjabar.viewModel.UiState
 import kotlinx.coroutines.launch
+import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
+import org.intellij.markdown.html.HtmlGenerator
+import org.intellij.markdown.parser.MarkdownParser
+
 @AndroidEntryPoint
 class ScanFragment : Fragment() {
 
@@ -97,7 +102,11 @@ class ScanFragment : Fragment() {
                 is UiState.Success -> {
                     scanButton.isEnabled = true
                     skeletonLoader.visibility = View.GONE
-                    resultTextView.text = state.data
+                    val markdown = state.data
+                    val flavour = CommonMarkFlavourDescriptor()
+                    val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(markdown)
+                    val html = HtmlGenerator(markdown, parsedTree, flavour).generateHtml()
+                    resultTextView.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
                     resultCardView.visibility = View.VISIBLE
                     val fadeInAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
                     resultCardView.startAnimation(fadeInAnimation)

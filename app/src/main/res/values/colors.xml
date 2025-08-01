@@ -3,4 +3,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="status_bar_dark">#FF212121</color>
+    <color name="bg_color">#FFF1FCF4</color>
+    <color name="bg_blue">#FFF2F6FC</color>
+    <color name="primary">#FF709D63</color>
+    <color name="text_muted_foreground">#FF858585</color>
+    <color name="text_blue">#FF2C3EA3</color>
+    <color name="text_primary">#FF779867</color>
+    <color name="text_desctructive">#FFF72C5B</color>
 </resources>

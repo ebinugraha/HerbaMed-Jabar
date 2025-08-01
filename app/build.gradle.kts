@@ -83,6 +83,9 @@ dependencies {
     kapt(libs.androidx.room.compiler)
     // Dukungan Room untuk Coroutines
     implementation(libs.androidx.room.ktx)
+
+    // Markdown rendering
+    implementation(libs.markdown)
 }
 // Tambahkan ini di bagian paling bawah file
 kapt {

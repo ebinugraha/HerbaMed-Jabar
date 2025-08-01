@@ -375,7 +375,7 @@
                         android:minHeight="100dp"
                         android:padding="16dp"
                         android:textColor="@android:color/black"
-                        android:textSize="16sp"
+                        android:textSize="12sp"
                         tools:text="Hasil analisis akan muncul di sini..." />
                 </androidx.cardview.widget.CardView>
 

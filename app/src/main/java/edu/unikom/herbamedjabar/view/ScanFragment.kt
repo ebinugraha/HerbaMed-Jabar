@@ -4,29 +4,24 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import com.google.ai.client.generativeai.GenerativeModel
-import com.google.ai.client.generativeai.type.content
 import dagger.hilt.android.AndroidEntryPoint
 import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.viewModel.ScanViewModel
 import edu.unikom.herbamedjabar.viewModel.UiState
-import kotlinx.coroutines.launch
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
@@ -34,14 +29,15 @@ import org.intellij.markdown.parser.MarkdownParser
 @AndroidEntryPoint
 class ScanFragment : Fragment() {
 
-    // Injeksi ViewModel menggunakan Hilt
     private val viewModel: ScanViewModel by viewModels()
 
     private lateinit var plantImageView: ImageView
     private lateinit var scanButton: Button
     private lateinit var resultTextView: TextView
-    private lateinit var skeletonLoader: LinearLayout
     private lateinit var resultCardView: CardView
+
+    // Variabel untuk dialog
+    private var processingDialog: ProcessingDialogFragment? = null
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
@@ -56,7 +52,6 @@ class ScanFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
             if (bitmap != null) {
                 plantImageView.setImageBitmap(bitmap)
-                // Panggil fungsi di ViewModel
                 viewModel.analyzeImage(bitmap)
             }
         }
@@ -65,6 +60,7 @@ class ScanFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // Hapus skeleton loader dari layout fragment_scan.xml jika masih ada
         return inflater.inflate(R.layout.fragment_scan, container, false)
     }
 
@@ -82,7 +78,6 @@ class ScanFragment : Fragment() {
         plantImageView = view.findViewById(R.id.plantImageView)
         scanButton = view.findViewById(R.id.scanButton)
         resultTextView = view.findViewById(R.id.resultTextView)
-        skeletonLoader = view.findViewById(R.id.skeletonLoader)
         resultCardView = view.findViewById(R.id.resultCardView)
     }
 
@@ -91,17 +86,19 @@ class ScanFragment : Fragment() {
             when (state) {
                 is UiState.Idle -> {
                     scanButton.isEnabled = true
-                    skeletonLoader.visibility = View.GONE
                     resultCardView.visibility = View.INVISIBLE
                 }
                 is UiState.Loading -> {
                     scanButton.isEnabled = false
-                    skeletonLoader.visibility = View.VISIBLE
                     resultCardView.visibility = View.INVISIBLE
+                    // Tampilkan dialog
+                    processingDialog = ProcessingDialogFragment()
+                    processingDialog?.show(childFragmentManager, "processing_dialog")
                 }
                 is UiState.Success -> {
                     scanButton.isEnabled = true
-                    skeletonLoader.visibility = View.GONE
+                    // Tutup dialog
+                    processingDialog?.dismiss()
                     val markdown = state.data
                     val flavour = CommonMarkFlavourDescriptor()
                     val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(markdown)
@@ -113,7 +110,8 @@ class ScanFragment : Fragment() {
                 }
                 is UiState.Error -> {
                     scanButton.isEnabled = true
-                    skeletonLoader.visibility = View.GONE
+                    // Tutup dialog
+                    processingDialog?.dismiss()
                     resultCardView.visibility = View.VISIBLE
                     resultTextView.text = state.message
                     Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()

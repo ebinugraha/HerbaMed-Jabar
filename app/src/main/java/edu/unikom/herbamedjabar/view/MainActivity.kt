@@ -4,27 +4,27 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import edu.unikom.herbamedjabar.R
+import edu.unikom.herbamedjabar.databinding.ActivityMainBinding
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-
+    private lateinit var binding: ActivityMainBinding
     private val scanFragment = ScanFragment()
     private val historyFragment = HistoryFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        setContentView(R.layout.activity_main)
 
-        val navView: BottomNavigationView = findViewById(R.id.nav_view)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         setCurrentFragment(scanFragment)
 
-        navView.setOnItemSelectedListener { item ->
+        binding.navView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_scan -> setCurrentFragment(scanFragment)
                 R.id.navigation_history -> setCurrentFragment(historyFragment)

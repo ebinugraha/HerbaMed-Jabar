@@ -1,6 +1,5 @@
 package edu.unikom.herbamedjabar.view
 
-import android.R
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +18,7 @@ class ProcessingDialogFragment : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Set dialog agar fullscreen
-        setStyle(STYLE_NORMAL, R.style.Theme_Material_Light_NoActionBar)
+        setStyle(STYLE_NORMAL, android.R.style.Theme_Material_Light_NoActionBar)
     }
 
     override fun onCreateView(

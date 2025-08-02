@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
-import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.adapter.HistoryAdapter
 import edu.unikom.herbamedjabar.databinding.FragmentHistoryBinding
 import edu.unikom.herbamedjabar.viewModel.HistoryViewModel

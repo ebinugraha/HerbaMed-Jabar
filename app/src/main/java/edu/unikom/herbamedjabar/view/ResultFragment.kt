@@ -6,45 +6,45 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import dagger.hilt.android.AndroidEntryPoint
 import edu.unikom.herbamedjabar.R
+import edu.unikom.herbamedjabar.databinding.FragmentResultBinding
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
 import java.io.File
+
 @AndroidEntryPoint
 class ResultFragment : Fragment() {
+
+    private var _binding: FragmentResultBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_result, container, false)
+        _binding = FragmentResultBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val resultImageView: ImageView = view.findViewById(R.id.resultImageView)
-        val resultTextView: TextView = view.findViewById(R.id.resultTextView)
 
         // Ambil data dari arguments
         val imagePath = arguments?.getString(ARG_IMAGE_PATH)
         val resultText = arguments?.getString(ARG_RESULT_TEXT)
 
         // Inisialisasi tombol baru
-        val backButton: Button = view.findViewById(R.id.backButton)
         val scanAgainButton: Button = view.findViewById(R.id.scanAgainButton)
 
         // Tampilkan gambar dari path
         if (imagePath != null) {
             val imageFile = File(imagePath)
             if (imageFile.exists()) {
-                resultImageView.setImageURI(Uri.fromFile(imageFile))
+                binding.resultImageView.setImageURI(Uri.fromFile(imageFile))
             }
         }
 
@@ -53,9 +53,12 @@ class ResultFragment : Fragment() {
             val flavour = CommonMarkFlavourDescriptor()
             val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(resultText)
             val html = HtmlGenerator(resultText, parsedTree, flavour).generateHtml()
-            resultTextView.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
+            binding.resultTextView.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
 
+        binding.backButton.setOnClickListener {
+            activity?.supportFragmentManager?.popBackStack()
+        }
     }
 
     // Companion object untuk membuat instance fragment dengan cara yang bersih

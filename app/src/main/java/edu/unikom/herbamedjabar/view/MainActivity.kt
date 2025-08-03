@@ -5,28 +5,27 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import edu.unikom.herbamedjabar.R
+import edu.unikom.herbamedjabar.databinding.ActivityMainBinding
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var navView: BottomNavigationView
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        setContentView(R.layout.activity_main)
-
-        navView = findViewById(R.id.nav_view)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         if (savedInstanceState == null) {
             // Tampilkan fragment awal (ScanFragment)
             setCurrentFragment(ScanFragment(), false)
         }
 
-        navView.setOnItemSelectedListener { item ->
+        binding.navView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_scan -> {
                     setCurrentFragment(ScanFragment(), false)
@@ -58,14 +57,14 @@ class MainActivity : AppCompatActivity() {
         // Ganti fragment dan tambahkan ke back stack agar bisa kembali
         setCurrentFragment(resultFragment, true)
         // Sembunyikan bottom navigation di halaman hasil
-        navView.visibility = View.GONE
+        binding.navView.visibility = View.GONE
     }
 
     // Override tombol kembali untuk menampilkan bottom nav lagi
     override fun onBackPressed() {
         super.onBackPressed()
         if (supportFragmentManager.backStackEntryCount == 0) {
-            navView.visibility = View.VISIBLE
+            binding.navView.visibility = View.VISIBLE
         }
     }
 }

@@ -21,21 +21,20 @@ class ScanFragment : Fragment() {
 
     private val viewModel: ScanViewModel by viewModels()
     private var _binding: FragmentScanBinding? = null
-    private val binding get() = _binding!!
+    private val binding
+        get() = _binding!!
 
     private var processingDialog: ProcessingDialogFragment? = null
 
     private val requestPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean
+            ->
             if (isAdded) {
                 if (isGranted) {
                     takePictureLauncher.launch(null)
                 } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "Izin kamera ditolak",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(requireContext(), "Izin kamera ditolak", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
@@ -49,8 +48,9 @@ class ScanFragment : Fragment() {
         }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentScanBinding.inflate(inflater, container, false)
         return binding.root
@@ -60,9 +60,13 @@ class ScanFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeViewModel()
 
-        binding.scanButton.setOnClickListener {
-            checkCameraPermissionAndOpenCamera()
+        parentFragmentManager.setFragmentResultListener("scan_again_request", this) { _, bundle ->
+            if (bundle.getBoolean("open_camera")) {
+                checkCameraPermissionAndOpenCamera()
+            }
         }
+
+        binding.scanButton.setOnClickListener { checkCameraPermissionAndOpenCamera() }
     }
 
     private fun observeViewModel() {
@@ -82,7 +86,8 @@ class ScanFragment : Fragment() {
                     processingDialog = ProcessingDialogFragment()
                     processingDialog?.show(childFragmentManager, ProcessingDialogFragment.TAG)
                 }
-                is UiState.Success, is UiState.Error -> {
+                is UiState.Success,
+                is UiState.Error -> {
                     processingDialog?.dismiss()
                     if (state is UiState.Error) {
                         context?.let { ctx ->
@@ -90,7 +95,9 @@ class ScanFragment : Fragment() {
                         }
                     }
                 }
-                else -> { /* Idle */ }
+                else -> {
+                    /* Idle */
+                }
             }
         }
     }
@@ -104,10 +111,8 @@ class ScanFragment : Fragment() {
     private fun checkCameraPermissionAndOpenCamera() {
         // ... (kode ini tidak berubah)
         when {
-            ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED -> {
                 takePictureLauncher.launch(null)
             }
             else -> {

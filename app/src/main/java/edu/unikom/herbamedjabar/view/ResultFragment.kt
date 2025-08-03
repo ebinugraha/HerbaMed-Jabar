@@ -5,26 +5,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import dagger.hilt.android.AndroidEntryPoint
-import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.databinding.FragmentResultBinding
+import java.io.File
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
-import java.io.File
 
 @AndroidEntryPoint
 class ResultFragment : Fragment() {
 
     private var _binding: FragmentResultBinding? = null
-    private val binding get() = _binding!!
+    private val binding
+        get() = _binding!!
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentResultBinding.inflate(inflater, container, false)
         return binding.root
@@ -36,9 +36,6 @@ class ResultFragment : Fragment() {
         // Ambil data dari arguments
         val imagePath = arguments?.getString(ARG_IMAGE_PATH)
         val resultText = arguments?.getString(ARG_RESULT_TEXT)
-
-        // Inisialisasi tombol baru
-        val scanAgainButton: Button = view.findViewById(R.id.scanAgainButton)
 
         // Tampilkan gambar dari path
         if (imagePath != null) {
@@ -53,10 +50,17 @@ class ResultFragment : Fragment() {
             val flavour = CommonMarkFlavourDescriptor()
             val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(resultText)
             val html = HtmlGenerator(resultText, parsedTree, flavour).generateHtml()
-            binding.resultTextView.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
+            binding.resultTextView.text =
+                HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
 
-        binding.backButton.setOnClickListener {
+        binding.backButton.setOnClickListener { activity?.supportFragmentManager?.popBackStack() }
+
+        binding.scanAgainButton.setOnClickListener {
+            parentFragmentManager.setFragmentResult(
+                "scan_again_request",
+                Bundle().apply { putBoolean("open_camera", true) },
+            )
             activity?.supportFragmentManager?.popBackStack()
         }
     }
@@ -68,10 +72,11 @@ class ResultFragment : Fragment() {
 
         fun newInstance(imagePath: String, resultText: String): ResultFragment {
             val fragment = ResultFragment()
-            val args = Bundle().apply {
-                putString(ARG_IMAGE_PATH, imagePath)
-                putString(ARG_RESULT_TEXT, resultText)
-            }
+            val args =
+                Bundle().apply {
+                    putString(ARG_IMAGE_PATH, imagePath)
+                    putString(ARG_RESULT_TEXT, resultText)
+                }
             fragment.arguments = args
             return fragment
         }

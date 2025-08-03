@@ -6,15 +6,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import edu.unikom.herbamedjabar.repository.AnalysisResult
 import edu.unikom.herbamedjabar.useCase.AnalyzePlantUseCase
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// Definisikan state untuk UI
 sealed class UiState {
     object Idle : UiState()
     object Loading : UiState()
-    data class Success(val data: String) : UiState()
+    object Success : UiState()
     data class Error(val message: String) : UiState()
 }
 
@@ -26,15 +26,29 @@ class ScanViewModel @Inject constructor(
     private val _uiState = MutableLiveData<UiState>(UiState.Idle)
     val uiState: LiveData<UiState> = _uiState
 
+    // LiveData untuk navigasi sekarang membawa AnalysisResult
+    private val _navigateToResult = MutableLiveData<AnalysisResult?>()
+    val navigateToResult: LiveData<AnalysisResult?> = _navigateToResult
+
     fun analyzeImage(bitmap: Bitmap) {
         _uiState.value = UiState.Loading
         viewModelScope.launch {
             val result = analyzePlantUseCase(bitmap)
-            result.onSuccess { data ->
-                _uiState.postValue(UiState.Success(data))
+            result.onSuccess { analysisResult ->
+                _uiState.postValue(UiState.Success)
+                // Picu navigasi dengan mengirimkan data yang dibutuhkan
+                _navigateToResult.postValue(analysisResult)
             }.onFailure { error ->
                 _uiState.postValue(UiState.Error(error.message ?: "Terjadi kesalahan tidak diketahui"))
             }
+        }
+    }
+
+    // Panggil ini setelah navigasi selesai untuk mencegah navigasi berulang
+    fun onNavigationComplete() {
+        _navigateToResult.value = null
+        if (_uiState.value !is UiState.Loading) {
+            _uiState.value = UiState.Idle
         }
     }
 }

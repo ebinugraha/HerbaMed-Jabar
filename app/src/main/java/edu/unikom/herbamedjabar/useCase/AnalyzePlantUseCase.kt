@@ -1,13 +1,15 @@
 package edu.unikom.herbamedjabar.useCase
 
 import android.graphics.Bitmap
+import edu.unikom.herbamedjabar.repository.AnalysisResult
 import edu.unikom.herbamedjabar.repository.PlantRepository
 import javax.inject.Inject
 
 class AnalyzePlantUseCase @Inject constructor(
     private val plantRepository: PlantRepository
 ) {
-    suspend operator fun invoke(bitmap: Bitmap): Result<String> {
+    // Ubah tipe kembalian menjadi Result yang membungkus AnalysisResult
+    suspend operator fun invoke(bitmap: Bitmap): Result<AnalysisResult> {
         return try {
             val prompt = """
                 Anda adalah seorang ahli botani dan herbalis berpengalaman. Tugas Anda adalah menganalisis gambar tanaman yang diberikan dan memberikan informasi yang akurat, terstruktur, dan mudah dipahami dalam format Markdown.
@@ -46,8 +48,7 @@ class AnalyzePlantUseCase @Inject constructor(
             """.trimIndent()
 
             val response = plantRepository.analyzePlant(bitmap, prompt)
-            val resultText = response.text ?: "Gagal mendapatkan teks dari respons."
-            Result.success(resultText)
+            Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }

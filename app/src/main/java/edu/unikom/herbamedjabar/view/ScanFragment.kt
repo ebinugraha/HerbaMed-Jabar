@@ -2,20 +2,17 @@ package edu.unikom.herbamedjabar.view
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
-import edu.unikom.herbamedjabar.R
+import edu.unikom.herbamedjabar.databinding.FragmentScanBinding
 import edu.unikom.herbamedjabar.viewModel.ScanViewModel
 import edu.unikom.herbamedjabar.viewModel.UiState
 
@@ -23,49 +20,53 @@ import edu.unikom.herbamedjabar.viewModel.UiState
 class ScanFragment : Fragment() {
 
     private val viewModel: ScanViewModel by viewModels()
-
-    private lateinit var plantImageView: ImageView
-    private lateinit var scanButton: Button
+    private var _binding: FragmentScanBinding? = null
+    private val binding
+        get() = _binding!!
 
     private var processingDialog: ProcessingDialogFragment? = null
 
     private val requestPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-            if (isGranted) {
-                takePictureLauncher.launch(null)
-            } else {
-                Toast.makeText(requireContext(), "Izin kamera ditolak", Toast.LENGTH_SHORT).show()
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean
+            ->
+            if (isAdded) {
+                if (isGranted) {
+                    takePictureLauncher.launch(null)
+                } else {
+                    Toast.makeText(requireContext(), "Izin kamera ditolak", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
         }
 
     private val takePictureLauncher =
         registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
             if (bitmap != null) {
-                plantImageView.setImageBitmap(bitmap)
+                binding.plantImageView.setImageBitmap(bitmap)
                 viewModel.analyzeImage(bitmap)
             }
         }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
-        return inflater.inflate(R.layout.fragment_scan, container, false)
+        _binding = FragmentScanBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initViews(view)
         observeViewModel()
 
-        scanButton.setOnClickListener {
-            checkCameraPermissionAndOpenCamera()
+        parentFragmentManager.setFragmentResultListener("scan_again_request", this) { _, bundle ->
+            if (bundle.getBoolean("open_camera")) {
+                checkCameraPermissionAndOpenCamera()
+            }
         }
-    }
 
-    private fun initViews(view: View) {
-        plantImageView = view.findViewById(R.id.plantImageView)
-        scanButton = view.findViewById(R.id.scanButton)
+        binding.scanButton.setOnClickListener { checkCameraPermissionAndOpenCamera() }
     }
 
     private fun observeViewModel() {
@@ -83,26 +84,35 @@ class ScanFragment : Fragment() {
             when (state) {
                 is UiState.Loading -> {
                     processingDialog = ProcessingDialogFragment()
-                    processingDialog?.show(childFragmentManager, "processing_dialog")
+                    processingDialog?.show(childFragmentManager, ProcessingDialogFragment.TAG)
                 }
-                is UiState.Success, is UiState.Error -> {
+                is UiState.Success,
+                is UiState.Error -> {
                     processingDialog?.dismiss()
                     if (state is UiState.Error) {
-                        Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()
+                        context?.let { ctx ->
+                            Toast.makeText(ctx, state.message, Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
-                else -> { /* Idle */ }
+                else -> {
+                    /* Idle */
+                }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        processingDialog?.dismiss()
     }
 
     private fun checkCameraPermissionAndOpenCamera() {
         // ... (kode ini tidak berubah)
         when {
-            ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED -> {
                 takePictureLauncher.launch(null)
             }
             else -> {

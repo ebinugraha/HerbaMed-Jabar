@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -18,7 +21,16 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        // Membaca API key dari local.properties
+        val properties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            properties.load(FileInputStream(localPropertiesFile))
+        }
 
+        val apiKey = properties.getProperty("apiKey", "")
+        // Menyediakan API key sebagai string resource
+        resValue("string", "api_key", apiKey)
     }
 
     buildTypes {
@@ -40,6 +52,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        // buildConfig tidak lagi diperlukan untuk ini
     }
 
 }

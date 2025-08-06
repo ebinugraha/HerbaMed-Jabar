@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import edu.unikom.herbamedjabar.R // Import R class
 import edu.unikom.herbamedjabar.dao.ScanHistoryDao
 import edu.unikom.herbamedjabar.db.AppDatabase
 import edu.unikom.herbamedjabar.repository.PlantRepository
@@ -19,14 +20,16 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideGenerativeModel(): GenerativeModel {
+    fun provideGenerativeModel(app: Application): GenerativeModel {
+        // Mengambil API key dari string resource yang dibuat oleh Gradle
+        val apiKey = app.getString(R.string.api_key)
         return GenerativeModel(
             modelName = "gemini-1.5-flash",
-            apiKey = "AIzaSyAMYG07-BBN21gNqGtfYwRUcuAr6kjzQyA" // JANGAN LUPA GANTI API KEY ANDA
+            apiKey = apiKey
         )
     }
 
-    // --- TAMBAHKAN PROVIDER UNTUK DATABASE DAN DAO ---
+    // --- PROVIDER UNTUK DATABASE DAN DAO TETAP SAMA ---
     @Provides
     @Singleton
     fun provideAppDatabase(app: Application): AppDatabase {
@@ -47,10 +50,9 @@ object AppModule {
     @Singleton
     fun providePlantRepository(
         generativeModel: GenerativeModel,
-        scanHistoryDao: ScanHistoryDao, // Tambahkan DAO sebagai parameter
-        app: Application // Tambahkan Application context untuk menyimpan gambar
+        scanHistoryDao: ScanHistoryDao,
+        app: Application
     ): PlantRepository {
-        // Kita akan memperbarui implementasinya nanti
         return PlantRepositoryImpl(generativeModel, scanHistoryDao, app)
     }
 }

@@ -61,10 +61,10 @@ android {
 dependencies {
 
     // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-storage")
-    implementation("com.google.firebase:firebase-auth")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.auth)
 
     implementation(libs.lottie)
     implementation(libs.androidx.core.ktx)
@@ -107,6 +107,7 @@ dependencies {
 
     // Markdown rendering
     implementation(libs.markdown)
+    implementation(libs.circleimageview)
 }
 // Tambahkan ini di bagian paling bawah file
 kapt {

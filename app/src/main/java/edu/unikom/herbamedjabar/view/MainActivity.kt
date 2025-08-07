@@ -35,6 +35,10 @@ class MainActivity : AppCompatActivity() {
                     setCurrentFragment(HistoryFragment(), false)
                     true
                 }
+                R.id.navigation_profile -> {
+                    setCurrentFragment(ProfileFragment(), false)
+                    true
+                }
                 else -> false
             }
         }

@@ -39,10 +39,11 @@ class RegisterFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.registerButton.setOnClickListener {
+            val name = binding.nameEditText.text.toString().trim()
             val email = binding.emailEditText.text.toString().trim()
             val password = binding.passwordEditText.text.toString().trim()
             val confirmPassword = binding.confirmPasswordEditText.text.toString().trim()
-            viewModel.registerUser(email, password, confirmPassword)
+            viewModel.registerUser(name, email, password, confirmPassword)
         }
 
         binding.loginTextView.setOnClickListener {

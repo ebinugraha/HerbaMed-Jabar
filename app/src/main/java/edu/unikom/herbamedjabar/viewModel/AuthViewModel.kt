@@ -1,10 +1,13 @@
 package edu.unikom.herbamedjabar.viewModel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.userProfileChangeRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,8 +46,8 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun registerUser(email: String, password: String, confirmPassword: String) {
-        if (email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+    fun registerUser(name: String, email: String, password: String, confirmPassword: String) {
+        if (name.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
             _authState.value = AuthState.Error("Semua kolom harus diisi.")
             return
         }
@@ -63,8 +66,34 @@ class AuthViewModel @Inject constructor(
             try {
                 firebaseAuth.createUserWithEmailAndPassword(email, password).await()
                 _authState.postValue(AuthState.Authenticated)
+
+                val user = firebaseAuth.currentUser
+
+                val profileUpdates = userProfileChangeRequest {
+                    displayName = name
+                }
+
+                user!!.updateProfile(profileUpdates)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.d(TAG, "User profile updated.")
+                        }
+                    }
             } catch (e: Exception) {
                 _authState.postValue(AuthState.Error(e.message ?: "Registrasi gagal"))
+            }
+        }
+    }
+
+    fun logoutUser() {
+        _authState.value = AuthState.Loading
+        viewModelScope.launch {
+            try {
+                firebaseAuth.signOut()
+                _authState.postValue(AuthState.Idle)
+            } catch (e: Exception) {
+                _authState.postValue(AuthState.Error(e.message ?: "Signout gagal"))
+
             }
         }
     }

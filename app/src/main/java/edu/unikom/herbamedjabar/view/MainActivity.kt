@@ -1,18 +1,24 @@
 package edu.unikom.herbamedjabar.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.databinding.ActivityMainBinding
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    @Inject
+    lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,15 +26,25 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        if (auth.currentUser == null) {
+            startActivity(Intent(this, AuthActivity::class.java))
+            finish()
+            return
+        }
+
         if (savedInstanceState == null) {
             // Tampilkan fragment awal (ScanFragment)
-            setCurrentFragment(ScanFragment(), false)
+            setCurrentFragment(ForumFragment(), false)
         }
 
         binding.navView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_scan -> {
                     setCurrentFragment(ScanFragment(), false)
+                    true
+                }
+                R.id.navigation_forum -> {
+                    setCurrentFragment(ForumFragment(), false)
                     true
                 }
                 R.id.navigation_history -> {

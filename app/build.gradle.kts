@@ -60,6 +60,9 @@ android {
 
 dependencies {
 
+//    cloudinary
+    implementation("com.cloudinary:cloudinary-android:2.4.0")
+
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)

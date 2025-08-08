@@ -3,8 +3,10 @@ package edu.unikom.herbamedjabar.di
 import android.app.Application
 import androidx.room.Room
 import com.google.ai.client.generativeai.GenerativeModel
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
 import dagger.Provides
@@ -27,7 +29,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+    fun provideFirebaseFirestore(): FirebaseFirestore {
+        return Firebase.firestore
+    }
 
     @Provides
     @Singleton

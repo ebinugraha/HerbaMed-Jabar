@@ -12,21 +12,33 @@
         android:layout_width="0dp"
         android:layout_height="150dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/bg_place_holder"
+        android:src="@drawable/bg_profile"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="70dp"
+        android:layout_height="30dp"
+        app:cornerRadius="8dp"
         android:layout_marginTop="16dp"
+        android:padding="0dp"
+        app:backgroundTint="#FFE8E8"
+        android:textColor="#F53F3F"
+        android:textStyle="bold"
+        app:strokeColor="#F53F3F"
+        app:icon="@drawable/ic_log_out"
+        app:iconGravity="textStart"
+        app:iconSize="12dp"
+        app:iconTint="#F53F3F"
+        app:strokeWidth="1dp"
         android:layout_marginEnd="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_lock"
+        android:text="Logout"
+        android:textSize="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
+
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/iv_profile_picture"
@@ -47,11 +59,14 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:textColor="@color/white"
         android:text="Full Name"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/iv_profile_picture"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_banner" />
+        app:layout_constraintBottom_toBottomOf="@id/iv_banner"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

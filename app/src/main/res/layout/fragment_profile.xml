@@ -40,17 +40,18 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <ImageView
         android:id="@+id/iv_profile_picture"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="90dp"
-        android:src="@drawable/ic_logo_herbamed"
+        android:layout_width="68dp"
+        android:layout_height="68dp"
+        android:src="@drawable/ic_user_image2"
         app:civ_border_color="#FF000000"
         app:civ_border_width="2dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/iv_banner" />
+        app:layout_constraintTop_toBottomOf="@id/iv_banner"
+        app:layout_constraintBottom_toBottomOf="@id/iv_banner"
+        android:layout_marginStart="35dp"
+        />
 
     <TextView
         android:id="@+id/tv_full_name"
@@ -59,7 +60,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:textColor="@color/white"
         android:text="Full Name"
         android:textSize="20sp"
@@ -68,5 +69,85 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/iv_banner"
         />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_info_postingan"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:padding="0dp"
+        android:text="24 Postingan"
+        app:backgroundTint="#E4FFED"
+        app:strokeColor="#BBF7D0"
+        app:strokeWidth="1dp"
+        android:textSize="12sp"
+        android:textColor="#609B5A"
+        app:layout_constraintTop_toBottomOf="@id/iv_banner"
+        app:layout_constraintStart_toStartOf="@id/tv_full_name"
+        />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/iv_profile_picture"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingHorizontal="20dp"
+        android:layout_marginTop="18dp"
+        >
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/badge_1"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:padding="0dp"
+            android:text="Plant Hunter"
+            app:backgroundTint="#E4FFED"
+            android:textSize="10sp"
+            android:textColor="#609B5A"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/badge_2"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/badge_2"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:padding="0dp"
+            android:text="Plant Adventure"
+            app:backgroundTint="#FEF9C3"
+            android:textSize="10sp"
+            android:textColor="#854D0E"
+            app:layout_constraintStart_toEndOf="@id/badge_1"
+            app:layout_constraintEnd_toStartOf="@id/badge_3"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/badge_3"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:padding="0dp"
+            android:text="Plant Lover"
+            app:backgroundTint="#DBEAFE"
+            android:textSize="10sp"
+            android:textColor="#1E40AF"
+            app:layout_constraintStart_toEndOf="@id/badge_2"
+            app:layout_constraintEnd_toStartOf="@id/badge_4"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/badge_4"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:padding="0dp"
+            android:text="King Plant"
+            app:backgroundTint="#F3E8FF"
+            android:textSize="10sp"
+            android:textColor="#6E24A8"
+            app:layout_constraintStart_toEndOf="@id/badge_3"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

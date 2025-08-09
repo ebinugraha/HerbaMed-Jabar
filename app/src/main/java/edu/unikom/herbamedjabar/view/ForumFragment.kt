@@ -34,10 +34,6 @@ class ForumFragment : Fragment() {
 
         setupRecyclerView()
         observeViewModel()
-
-        binding.fabAddPost.setOnClickListener {
-            // Navigate to create post screen (to be implemented)
-        }
     }
 
     private fun setupRecyclerView() {

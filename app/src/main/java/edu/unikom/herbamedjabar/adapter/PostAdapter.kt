@@ -36,8 +36,8 @@ class PostAdapter(private val onLikeClicked: (String) -> Unit) : ListAdapter<Pos
             binding.apply {
                 tvUsername.text = post.username
                 ivUserProfile.load(post.userProfilePictureUrl) {
-                    placeholder(R.drawable.ic_user)
-                    error(R.drawable.ic_user)
+                    placeholder(R.drawable.ic_user_image)
+                    error(R.drawable.ic_user_image)
                 }
                 ivPostImage.load(post.imageUrl) {
                     placeholder(R.drawable.bg_place_holder)

@@ -4,8 +4,10 @@
 
     <!-- Izin untuk mengakses kamera -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
-    <!-- Izin BARU untuk mengakses internet -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <!-- Izin untuk mengakses internet -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -19,18 +21,36 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HerbaMedJabar"
         tools:targetApi="31">
+
+        <!-- SplashActivity adalah SATU-SATUNYA titik masuk (LAUNCHER) -->
         <activity
-            android:name=".view.AuthActivity"
-            android:exported="true">
+            android:name=".view.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.App.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Activity lain tidak boleh memiliki intent-filter LAUNCHER -->
+        <activity
+            android:name=".view.AuthActivity"
+            android:exported="false" />
         <activity
             android:name=".view.MainActivity"
             android:exported="false" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
 
 </manifest>

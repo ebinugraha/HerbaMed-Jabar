@@ -61,7 +61,8 @@ android {
 dependencies {
 
 //    cloudinary
-    implementation("com.cloudinary:cloudinary-android:2.4.0")
+    implementation(libs.cloudinary.android)
+    implementation(libs.androidx.core.splashscreen)
 
     // Firebase
     implementation(platform(libs.firebase.bom))

@@ -31,8 +31,7 @@
             android:paddingHorizontal="12dp"
             android:text="Logout"
             android:textColor="#F53F3F"
-            android:textSize="12sp"
-            android:textStyle="bold"
+            android:textSize="9sp"
             app:backgroundTint="#FFE8E8"
             app:cornerRadius="8dp"
             app:icon="@drawable/ic_log_out"
@@ -41,7 +40,7 @@
             app:iconTint="#F53F3F"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:strokeColor="#F53F3F"
+            app:strokeColor="#F7BBBC"
             app:strokeWidth="1dp" />
 
         <de.hdodenhof.circleimageview.CircleImageView

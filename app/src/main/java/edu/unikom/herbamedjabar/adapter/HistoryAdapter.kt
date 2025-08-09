@@ -2,39 +2,51 @@ package edu.unikom.herbamedjabar.adapter
 
 import android.net.Uri
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.data.ScanHistory
+import edu.unikom.herbamedjabar.databinding.ItemHistoryBinding
 import java.io.File
 
-class HistoryAdapter : ListAdapter<ScanHistory, HistoryAdapter.HistoryViewHolder>(HistoryDiffCallback()) {
+class HistoryAdapter :
+    ListAdapter<ScanHistory, HistoryAdapter.HistoryViewHolder>(HistoryDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_history, parent, false)
-        return HistoryViewHolder(view)
+        val binding =
+            ItemHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return HistoryViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
         val historyItem = getItem(position)
-        holder.bind(historyItem)
+        holder.bind(historyItem, position)
     }
 
-    class HistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val imageView: ImageView = itemView.findViewById(R.id.historyImageView)
-        private val textView: TextView = itemView.findViewById(R.id.historyTextView)
+    inner class HistoryViewHolder(private val binding: ItemHistoryBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(history: ScanHistory, position: Int) { // Terima posisi di sini
+            binding.apply {
+                // Menggunakan ID dari layout baru Anda dan data class yang sudah diperbarui
+                historyTextView.text = history.resultText
 
-        fun bind(history: ScanHistory) {
-            textView.text = history.resultText
-            // Muat gambar dari path file lokal
-            val imageFile = File(history.imagePath)
-            if (imageFile.exists()) {
-                imageView.setImageURI(Uri.fromFile(imageFile))
+                val imageFile = File(history.imagePath)
+                if (imageFile.exists()) {
+                    historyImageView.load(Uri.fromFile(imageFile)) {
+                        crossfade(true)
+                        placeholder(R.drawable.bg_place_holder)
+                    }
+                }
+
+                // --- LOGIKA WARNA WARNI ---
+                val context = binding.root.context
+                val pastelColors = context.resources.getIntArray(R.array.pastel_colors)
+                val color = pastelColors[position % pastelColors.size]
+                // Terapkan warna ke latar belakang item (root layout)
+                binding.root.setBackgroundColor(color)
             }
         }
     }

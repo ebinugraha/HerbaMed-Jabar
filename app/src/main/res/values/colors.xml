@@ -10,4 +10,15 @@
     <color name="text_blue">#FF2C3EA3</color>
     <color name="text_primary">#FF779867</color>
     <color name="text_desctructive">#FFF72C5B</color>
+
+    <color name="pastel_green">#E4FFED</color>
+    <color name="pastel_yellow">#FFFEE4</color>
+    <color name="pastel_orange">#FFF6E4</color>
+
+    <array name="pastel_colors">
+        <item>@color/pastel_green</item>
+        <item>@color/pastel_yellow</item>
+        <item>@color/pastel_orange</item>
+    </array>
+
 </resources>

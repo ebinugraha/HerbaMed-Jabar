@@ -1,153 +1,181 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_color"
-    tools:context=".view.ProfileFragment">
-
-    <ImageView
-        android:id="@+id/iv_banner"
-        android:layout_width="0dp"
-        android:layout_height="150dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/bg_profile"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_logout"
-        android:layout_width="70dp"
-        android:layout_height="30dp"
-        app:cornerRadius="8dp"
-        android:layout_marginTop="16dp"
-        android:padding="0dp"
-        app:backgroundTint="#FFE8E8"
-        android:textColor="#F53F3F"
-        android:textStyle="bold"
-        app:strokeColor="#F53F3F"
-        app:icon="@drawable/ic_log_out"
-        app:iconGravity="textStart"
-        app:iconSize="12dp"
-        app:iconTint="#F53F3F"
-        app:strokeWidth="1dp"
-        android:layout_marginEnd="16dp"
-        android:text="Logout"
-        android:textSize="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-
-    <ImageView
-        android:id="@+id/iv_profile_picture"
-        android:layout_width="68dp"
-        android:layout_height="68dp"
-        android:src="@drawable/ic_user_image2"
-        app:civ_border_color="#FF000000"
-        app:civ_border_width="2dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_banner"
-        app:layout_constraintBottom_toBottomOf="@id/iv_banner"
-        android:layout_marginStart="35dp"
-        />
-
-    <TextView
-        android:id="@+id/tv_full_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        android:textColor="@color/white"
-        android:text="Full Name"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/iv_profile_picture"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/iv_banner"
-        />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_info_postingan"
-        android:layout_width="wrap_content"
-        android:layout_height="35dp"
-        android:padding="0dp"
-        android:text="24 Postingan"
-        app:backgroundTint="#E4FFED"
-        app:strokeColor="#BBF7D0"
-        app:strokeWidth="1dp"
-        android:textSize="12sp"
-        android:textColor="#609B5A"
-        app:layout_constraintTop_toBottomOf="@id/iv_banner"
-        app:layout_constraintStart_toStartOf="@id/tv_full_name"
-        />
+    android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/iv_profile_picture"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:paddingHorizontal="20dp"
-        android:layout_marginTop="18dp"
-        >
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/badge_1"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:padding="0dp"
-            android:text="Plant Hunter"
-            app:backgroundTint="#E4FFED"
-            android:textSize="10sp"
-            android:textColor="#609B5A"
+        tools:context=".view.ProfileFragment">
+
+        <ImageView
+            android:id="@+id/iv_banner"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/bg_profile"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/badge_2"
-            app:layout_constraintTop_toTopOf="parent"
-            />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/badge_2"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:padding="0dp"
-            android:text="Plant Adventure"
-            app:backgroundTint="#FEF9C3"
-            android:textSize="10sp"
-            android:textColor="#854D0E"
-            app:layout_constraintStart_toEndOf="@id/badge_1"
-            app:layout_constraintEnd_toStartOf="@id/badge_3"
-            app:layout_constraintTop_toTopOf="parent"
-            />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/badge_3"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:padding="0dp"
-            android:text="Plant Lover"
-            app:backgroundTint="#DBEAFE"
-            android:textSize="10sp"
-            android:textColor="#1E40AF"
-            app:layout_constraintStart_toEndOf="@id/badge_2"
-            app:layout_constraintEnd_toStartOf="@id/badge_4"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/badge_4"
+            android:id="@+id/btn_logout"
             android:layout_width="wrap_content"
             android:layout_height="35dp"
-            android:padding="0dp"
-            android:text="King Plant"
-            app:backgroundTint="#F3E8FF"
-            android:textSize="10sp"
-            android:textColor="#6E24A8"
-            app:layout_constraintStart_toEndOf="@id/badge_3"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:paddingHorizontal="12dp"
+            android:text="Logout"
+            android:textColor="#F53F3F"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:backgroundTint="#FFE8E8"
+            app:cornerRadius="8dp"
+            app:icon="@drawable/ic_log_out"
+            app:iconGravity="textStart"
+            app:iconSize="14dp"
+            app:iconTint="#F53F3F"
             app:layout_constraintEnd_toEndOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="#F53F3F"
+            app:strokeWidth="1dp" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv_profile_picture"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="24dp"
+            android:src="@drawable/ic_user_image2"
+            app:civ_border_color="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="@id/iv_banner"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_banner" />
+
+        <TextView
+            android:id="@+id/tv_username"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/iv_profile_picture"
+            app:layout_constraintBottom_toBottomOf="@id/iv_banner"
+            tools:text="Full Name" />
+
+        <TextView
+            android:id="@+id/tv_email"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:textColor="@color/text_muted_foreground"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/iv_profile_picture"
+            app:layout_constraintTop_toBottomOf="@id/tv_username"
+            tools:text="email@example.com" />
+
+
+        <LinearLayout
+            android:id="@+id/badge_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:paddingHorizontal="20dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_profile_picture">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/badge_1"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:padding="0dp"
+                android:text="Plant Hunter"
+                android:textColor="#609B5A"
+                android:textSize="10sp"
+                app:backgroundTint="#E4FFED" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/badge_2"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:padding="0dp"
+                android:text="Plant Adventure"
+                android:textColor="#854D0E"
+                android:textSize="10sp"
+                android:layout_marginHorizontal="2dp"
+                app:backgroundTint="#FEF9C3"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/badge_3"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:padding="0dp"
+                android:text="Plant Lover"
+                android:textColor="#1E40AF"
+                android:textSize="10sp"
+                android:layout_marginHorizontal="2dp"
+                app:backgroundTint="#DBEAFE" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/badge_4"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:padding="0dp"
+                android:text="King Plant"
+                android:textColor="#6E24A8"
+                android:textSize="10sp"
+                app:backgroundTint="#F3E8FF" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_my_posts_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="24dp"
+            android:text="Postingan Saya"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/badge_container" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_my_posts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:nestedScrollingEnabled="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_my_posts_title"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_post" />
+
+        <TextView
+            android:id="@+id/tv_no_posts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="32dp"
+            android:text="Anda belum membuat postingan."
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/tv_my_posts_title"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

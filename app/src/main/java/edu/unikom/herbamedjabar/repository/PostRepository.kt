@@ -22,37 +22,46 @@ import kotlin.coroutines.resumeWithException
 @Singleton
 class PostRepository @Inject constructor(
     private val firestore: FirebaseFirestore
-    // FirebaseStorage tidak lagi diinject di sini
 ) {
 
-    /**
-     * Mengambil daftar postingan dari Firestore secara real-time.
-     * Postingan diurutkan berdasarkan waktu terbaru.
-     */
     fun getPosts(): Flow<List<Post>> = callbackFlow {
         val collection = firestore.collection("posts")
             .orderBy("timestamp", Query.Direction.DESCENDING)
 
         val listener = collection.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                close(error) // Menutup flow jika terjadi error
+                close(error)
                 return@addSnapshotListener
             }
             if (snapshot != null) {
-                // Konversi dokumen snapshot menjadi daftar objek Post
                 val posts = snapshot.toObjects(Post::class.java)
-                trySend(posts).isSuccess // Mengirim data terbaru ke flow
+                trySend(posts).isSuccess
             }
         }
-        // Menghapus listener saat flow ditutup untuk menghindari memory leak
         awaitClose { listener.remove() }
     }
 
-    /**
-     * Membuat postingan baru.
-     * Proses ini mencakup pengunggahan gambar ke Cloudinary
-     * dan penyimpanan data postingan ke Firestore.
-     */
+    fun getPostsByUserId(userId: String): Flow<List<Post>> = callbackFlow {
+        // Hapus .orderBy() untuk menghindari error indeks
+        val collection = firestore.collection("posts")
+            .whereEqualTo("userId", userId)
+
+        val listener = collection.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error)
+                return@addSnapshotListener
+            }
+            if (snapshot != null) {
+                val posts = snapshot.toObjects(Post::class.java)
+                // Urutkan data secara manual di sini
+                val sortedPosts = posts.sortedByDescending { it.timestamp }
+                trySend(sortedPosts).isSuccess
+            }
+        }
+        awaitClose { listener.remove() }
+    }
+
+
     suspend fun createPost(
         userId: String,
         username: String,
@@ -61,10 +70,7 @@ class PostRepository @Inject constructor(
         plantName: String,
         description: String
     ) {
-        // 1. Unggah gambar ke Cloudinary dan dapatkan URL-nya
         val imageUrl = uploadImageToCloudinary(imageUri)
-
-        // 2. Buat objek Post dengan data yang relevan
         val postId = firestore.collection("posts").document().id
         val newPost = Post(
             id = postId,
@@ -76,22 +82,25 @@ class PostRepository @Inject constructor(
             description = description,
             timestamp = System.currentTimeMillis()
         )
-
-        // 3. Simpan objek Post ke koleksi "posts" di Firestore
         firestore.collection("posts").document(postId).set(newPost).await()
     }
 
-    /**
-     * Fungsi bantuan untuk mengunggah gambar ke Cloudinary.
-     * Menggunakan suspendCancellableCoroutine untuk membungkus callback-based API
-     * menjadi sebuah suspend function yang bisa dibatalkan.
-     */
+    suspend fun toggleLike(postId: String, userId: String) {
+        val postRef = firestore.collection("posts").document(postId)
+        firestore.runTransaction { transaction ->
+            val snapshot = transaction.get(postRef)
+            val likes = snapshot.get("likes") as? List<String> ?: emptyList()
+            if (likes.contains(userId)) {
+                transaction.update(postRef, "likes", FieldValue.arrayRemove(userId))
+            } else {
+                transaction.update(postRef, "likes", FieldValue.arrayUnion(userId))
+            }
+        }.await()
+    }
+
     private suspend fun uploadImageToCloudinary(imageUri: Uri): String = suspendCancellableCoroutine { continuation ->
         val requestId = MediaManager.get().upload(imageUri)
             .callback(object : UploadCallback {
-                override fun onStart(requestId: String) {}
-                override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {}
-
                 override fun onSuccess(requestId: String, resultData: Map<*, *>) {
                     val url = resultData["secure_url"] as? String
                     if (url != null && continuation.isActive) {
@@ -106,28 +115,13 @@ class PostRepository @Inject constructor(
                         continuation.resumeWithException(Exception("Cloudinary Error: ${error.description}"))
                     }
                 }
-
+                override fun onStart(requestId: String) {}
+                override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {}
                 override fun onReschedule(requestId: String, error: ErrorInfo) {}
             }).dispatch()
 
-        // Jika coroutine dibatalkan, batalkan juga request unggah ke Cloudinary
         continuation.invokeOnCancellation {
             MediaManager.get().cancelRequest(requestId)
         }
-    }
-
-    suspend fun toggleLike(postId: String, userId: String) {
-        val postRef = firestore.collection("posts").document(postId)
-        firestore.runTransaction { transaction ->
-            val snapshot = transaction.get(postRef)
-            val likes = snapshot.get("likes") as? List<String> ?: emptyList()
-            if (likes.contains(userId)) {
-                // Jika sudah me-like, hapus like (unlike)
-                transaction.update(postRef, "likes", FieldValue.arrayRemove(userId))
-            } else {
-                // Jika belum me-like, tambahkan like
-                transaction.update(postRef, "likes", FieldValue.arrayUnion(userId))
-            }
-        }.await()
     }
 }

@@ -86,18 +86,13 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    /**
-     * Fungsi untuk mengatur visibilitas lencana berdasarkan jumlah postingan.
-     */
     private fun updateBadgesVisibility(postCount: Int) {
         binding.apply {
-            // Sembunyikan semua lencana terlebih dahulu
             badge1.visibility = View.GONE
             badge2.visibility = View.GONE
             badge3.visibility = View.GONE
             badge4.visibility = View.GONE
 
-            // Tampilkan lencana berdasarkan jumlah postingan
             if (postCount >= 1) {
                 badge1.visibility = View.VISIBLE
             }

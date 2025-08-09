@@ -8,9 +8,6 @@ import dagger.hilt.android.HiltAndroidApp
 class HerbaAppApplication : Application(){
     override fun onCreate() {
         super.onCreate()
-        // ... kode Hilt yang sudah ada
-
-        // Konfigurasi dan inisialisasi Cloudinary
         val config = mapOf(
             "cloud_name" to "difspgu31",
             "api_key" to "152559576226315",

@@ -42,7 +42,6 @@ class PostRepository @Inject constructor(
     }
 
     fun getPostsByUserId(userId: String): Flow<List<Post>> = callbackFlow {
-        // Hapus .orderBy() untuk menghindari error indeks
         val collection = firestore.collection("posts")
             .whereEqualTo("userId", userId)
 
@@ -53,7 +52,6 @@ class PostRepository @Inject constructor(
             }
             if (snapshot != null) {
                 val posts = snapshot.toObjects(Post::class.java)
-                // Urutkan data secara manual di sini
                 val sortedPosts = posts.sortedByDescending { it.timestamp }
                 trySend(sortedPosts).isSuccess
             }

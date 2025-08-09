@@ -32,18 +32,17 @@ class ProcessingDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Animasikan progress bar untuk UX
         lifecycleScope.launch {
             var progress = 0
             while (progress <= 100) {
                 binding.progressBar.progress = progress
                 binding.progressTextView.text = "$progress%"
                 progress++
-                // Jeda bervariasi agar terlihat lebih natural
+
                 val randomDelay = (50..150).random().toLong()
                 delay(randomDelay)
-                if (progress > 95) { // Jangan sampai 100% agar user tahu proses masih berjalan
-                    delay(1000) // Tahan di akhir
+                if (progress > 95) {
+                    delay(1000)
                 }
             }
         }

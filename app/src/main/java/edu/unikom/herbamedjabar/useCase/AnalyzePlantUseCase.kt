@@ -8,7 +8,6 @@ import javax.inject.Inject
 class AnalyzePlantUseCase @Inject constructor(
     private val plantRepository: PlantRepository
 ) {
-    // Ubah tipe kembalian menjadi Result yang membungkus AnalysisResult
     suspend operator fun invoke(bitmap: Bitmap): Result<AnalysisResult> {
         return try {
             val prompt = """

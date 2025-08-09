@@ -15,11 +15,9 @@ import java.io.FileOutputStream
 import java.util.UUID
 import javax.inject.Inject
 
-// Data class sederhana untuk membungkus hasil analisis
 data class AnalysisResult(val resultText: String, val imagePath: String)
 
 interface PlantRepository {
-    // Ubah tipe kembalian menjadi data class baru kita
     suspend fun analyzePlant(bitmap: Bitmap, prompt: String): AnalysisResult
     fun getAllHistory(): Flow<List<ScanHistory>>
 }

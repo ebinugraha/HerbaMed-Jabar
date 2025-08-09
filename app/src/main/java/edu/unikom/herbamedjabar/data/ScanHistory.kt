@@ -8,6 +8,6 @@ data class ScanHistory(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val resultText: String,
-    val imagePath: String, // Path ke gambar yang disimpan di internal storage
+    val imagePath: String,
     val timestamp: Long = System.currentTimeMillis()
 )

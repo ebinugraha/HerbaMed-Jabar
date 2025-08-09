@@ -26,7 +26,6 @@ class ScanViewModel @Inject constructor(
     private val _uiState = MutableLiveData<UiState>(UiState.Idle)
     val uiState: LiveData<UiState> = _uiState
 
-    // LiveData untuk navigasi sekarang membawa AnalysisResult
     private val _navigateToResult = MutableLiveData<AnalysisResult?>()
     val navigateToResult: LiveData<AnalysisResult?> = _navigateToResult
 
@@ -36,7 +35,6 @@ class ScanViewModel @Inject constructor(
             val result = analyzePlantUseCase(bitmap)
             result.onSuccess { analysisResult ->
                 _uiState.postValue(UiState.Success)
-                // Picu navigasi dengan mengirimkan data yang dibutuhkan
                 _navigateToResult.postValue(analysisResult)
             }.onFailure { error ->
                 _uiState.postValue(UiState.Error(error.message ?: "Terjadi kesalahan tidak diketahui"))
@@ -44,7 +42,6 @@ class ScanViewModel @Inject constructor(
         }
     }
 
-    // Panggil ini setelah navigasi selesai untuk mencegah navigasi berulang
     fun onNavigationComplete() {
         _navigateToResult.value = null
         if (_uiState.value !is UiState.Loading) {

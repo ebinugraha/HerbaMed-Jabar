@@ -33,7 +33,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Activity lain tidak boleh memiliki intent-filter LAUNCHER -->
         <activity
             android:name=".view.AuthActivity"
             android:exported="false" />

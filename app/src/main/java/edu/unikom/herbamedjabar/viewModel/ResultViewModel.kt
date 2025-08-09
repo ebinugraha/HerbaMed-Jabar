@@ -34,7 +34,6 @@ class ResultViewModel @Inject constructor(
                     return@launch
                 }
 
-                // Menggunakan fungsi dari PostRepository yang sudah ada
                 postRepository.createPost(
                     userId = user.uid,
                     username = user.displayName ?: "Anonymous",

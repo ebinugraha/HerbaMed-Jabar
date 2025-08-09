@@ -11,7 +11,6 @@ class HistoryViewModel @Inject constructor(
     private val plantRepository: PlantRepository
 ) : ViewModel() {
 
-    // Ubah Flow dari repository menjadi LiveData yang bisa diobservasi oleh UI
     val allHistory = plantRepository.getAllHistory().asLiveData()
 
 }

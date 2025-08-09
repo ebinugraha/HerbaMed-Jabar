@@ -19,13 +19,10 @@ class SplashActivity : AppCompatActivity() {
     lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Panggil installSplashScreen() SEBELUM super.onCreate()
         installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        // Gunakan coroutine untuk menavigasi setelah delay singkat
         lifecycleScope.launchWhenCreated {
-            delay(1500) // Tampilkan splash screen selama 1.5 detik
 
             // Cek status login pengguna
             val destination = if (auth.currentUser != null) {
@@ -34,7 +31,7 @@ class SplashActivity : AppCompatActivity() {
                 AuthActivity::class.java
             }
             startActivity(Intent(this@SplashActivity, destination))
-            finish() // Tutup SplashActivity agar tidak bisa kembali
+            finish()
         }
     }
 }

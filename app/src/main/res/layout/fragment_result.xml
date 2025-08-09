@@ -109,6 +109,9 @@
                         android:layout_weight="1"
                         android:text="Posting"
                         android:textColor="@color/primary"
+                        app:icon="@drawable/ic_plus"
+                        app:iconGravity="textStart"
+                        app:iconTint="@color/primary"
                         app:cornerRadius="10dp"
                         app:strokeColor="@color/primary" />
                 </LinearLayout>

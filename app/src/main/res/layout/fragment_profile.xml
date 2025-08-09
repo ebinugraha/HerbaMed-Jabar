@@ -24,7 +24,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_logout"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="35dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
@@ -100,7 +100,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:padding="0dp"
-                android:text="Plant Hunter"
+                android:text="🌱 Plant Hunter"
                 android:textColor="#609B5A"
                 android:textSize="10sp"
                 app:backgroundTint="#E4FFED" />
@@ -110,7 +110,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:padding="0dp"
-                android:text="Plant Adventure"
+                android:text="🍃 Plant Adventure"
                 android:textColor="#854D0E"
                 android:textSize="10sp"
                 android:layout_marginHorizontal="2dp"
@@ -121,7 +121,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:padding="0dp"
-                android:text="Plant Lover"
+                android:text="❤️ Plant Lover"
                 android:textColor="#1E40AF"
                 android:textSize="10sp"
                 android:layout_marginHorizontal="2dp"
@@ -132,7 +132,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:padding="0dp"
-                android:text="King Plant"
+                android:text="👑 King Plant"
                 android:textColor="#6E24A8"
                 android:textSize="10sp"
                 app:backgroundTint="#F3E8FF" />

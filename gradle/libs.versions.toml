@@ -23,6 +23,7 @@ constraintlayout = "2.2.1"
 roomKtx = "2.6.1"
 markdown = "0.7.3"
 circleimageview = "3.1.0"
+gms = "4.4.3"
 
 [libraries]
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraxVersion" }
@@ -61,5 +62,7 @@ circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circ
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid"}
+hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
+gms = { id = "com.google.gms.google-services", version.ref = "gms" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
 

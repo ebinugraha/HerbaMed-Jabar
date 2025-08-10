@@ -1,8 +1,11 @@
 package edu.unikom.herbamedjabar.data
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 @Entity(tableName = "scan_history")
 data class ScanHistory(
     @PrimaryKey(autoGenerate = true)
@@ -10,4 +13,4 @@ data class ScanHistory(
     val resultText: String,
     val imagePath: String,
     val timestamp: Long = System.currentTimeMillis()
-)
+) : Parcelable

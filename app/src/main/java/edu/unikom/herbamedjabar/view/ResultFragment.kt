@@ -83,7 +83,6 @@ class ResultFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            // Ekstrak nama tanaman dari baris pertama teks hasil
             val plantName = resultText.lines().firstOrNull()
                 ?.replace("#", "")?.replace("*", "")?.trim() ?: "Tanaman Hasil Scan"
 
@@ -92,7 +91,7 @@ class ResultFragment : Fragment() {
             viewModel.createPostFromScan(
                 imageUri = imageUri,
                 plantName = plantName,
-                description = resultText // Kirim teks lengkap sebagai deskripsi
+                description = resultText
             )
         }
     }

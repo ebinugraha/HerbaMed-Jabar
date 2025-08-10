@@ -8,11 +8,13 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import edu.unikom.herbamedjabar.data.Post
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -122,4 +124,17 @@ class PostRepository @Inject constructor(
             MediaManager.get().cancelRequest(requestId)
         }
     }
+
+    suspend fun deletePost(post: Post) {
+        // 1. Hapus dokumen dari Firestore
+        firestore.collection("posts").document(post.id).delete().await()
+
+        // 2. Hapus gambar dari Cloudinary
+        // Ekstrak public ID dari URL gambar
+        val publicId = post.imageUrl.substringAfterLast("/").substringBeforeLast(".")
+        withContext(Dispatchers.IO) {
+            MediaManager.get().uploader().destroy(publicId, null)
+        }
+    }
+
 }

@@ -1,6 +1,7 @@
 package edu.unikom.herbamedjabar.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -17,7 +18,7 @@ import org.intellij.markdown.parser.MarkdownParser
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PostAdapter(private val onLikeClicked: (String) -> Unit) : ListAdapter<Post, PostAdapter.PostViewHolder>(DiffCallback()) {
+class PostAdapter(private val onLikeClicked: (String) -> Unit, private val onDeleteClicked: (Post) -> Unit) : ListAdapter<Post, PostAdapter.PostViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = ItemPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -61,6 +62,16 @@ class PostAdapter(private val onLikeClicked: (String) -> Unit) : ListAdapter<Pos
                 // Set listener klik
                 ivLike.setOnClickListener {
                     onLikeClicked(post.id)
+                }
+
+                // Tampilkan tombol hapus jika post milik user saat ini
+                if (post.userId == currentUser?.uid) {
+                    ivMenuOptions.visibility = View.VISIBLE
+                    ivMenuOptions.setOnClickListener {
+                        onDeleteClicked(post)
+                    }
+                } else {
+                    ivMenuOptions.visibility = View.GONE
                 }
 
                 // Format timestamp

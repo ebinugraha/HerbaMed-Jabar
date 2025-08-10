@@ -57,4 +57,15 @@ class ForumViewModel @Inject constructor(
             }
         }
     }
+
+    fun deletePost(post: Post) {
+        viewModelScope.launch {
+            try {
+                postRepository.deletePost(post)
+            } catch (e: Exception) {
+                _error.value = "Gagal menghapus postingan: ${e.message}"
+            }
+        }
+    }
+
 }

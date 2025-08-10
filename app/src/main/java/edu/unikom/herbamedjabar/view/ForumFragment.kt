@@ -49,6 +49,7 @@ class ForumFragment : Fragment() {
         postAdapter = PostAdapter{
                 postId ->
             viewModel.toggleLikeOnPost(postId)
+
         }
 
     binding.rvPosts.apply {

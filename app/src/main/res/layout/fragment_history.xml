@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.HistoryFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/bg_color"
@@ -22,8 +21,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:padding="18dp"
-            android:gravity="center"
-            >
+            android:gravity="center">
+
             <TextView
                 android:id="@+id/historyTitleTextView"
                 android:layout_width="wrap_content"
@@ -31,7 +30,8 @@
                 android:text="Riwayat Scan"
                 android:textColor="@color/black"
                 android:textStyle="bold"
-                android:textSize="18sp"/>
+                android:textSize="18sp" />
+
             <TextView
                 android:id="@+id/historySubTitleTextView"
                 android:layout_width="wrap_content"
@@ -39,7 +39,7 @@
                 android:layout_marginTop="4dp"
                 android:textColor="@color/text_muted_foreground"
                 android:text="Tanaman herbal yang pernah Anda scan"
-                android:textSize="12sp"/>
+                android:textSize="12sp" />
         </LinearLayout>
 
 

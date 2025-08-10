@@ -20,6 +20,7 @@ data class AnalysisResult(val resultText: String, val imagePath: String)
 interface PlantRepository {
     suspend fun analyzePlant(bitmap: Bitmap, prompt: String): AnalysisResult
     fun getAllHistory(): Flow<List<ScanHistory>>
+    suspend fun deleteHistory(history: ScanHistory)
 }
 
 class PlantRepositoryImpl @Inject constructor(
@@ -68,6 +69,10 @@ class PlantRepositoryImpl @Inject constructor(
 
     override fun getAllHistory(): Flow<List<ScanHistory>> {
         return scanHistoryDao.getAllHistory()
+    }
+
+    override suspend fun deleteHistory(history: ScanHistory) {
+        return scanHistoryDao.deleteHistory(history)
     }
 
     private suspend fun saveBitmapToFile(bitmap: Bitmap): String {

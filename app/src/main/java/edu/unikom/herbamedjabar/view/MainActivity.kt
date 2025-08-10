@@ -93,4 +93,9 @@ class MainActivity : AppCompatActivity() {
         // Ganti fragment dan tambahkan ke back stack agar bisa kembali
         setCurrentFragment(resultFragment, true)
     }
+
+    fun showHistoryDetailFragment(history: edu.unikom.herbamedjabar.data.ScanHistory) {
+        val historyDetailFragment = HistoryDetailFragment.newInstance(history)
+        setCurrentFragment(historyDetailFragment, true)
+    }
 }

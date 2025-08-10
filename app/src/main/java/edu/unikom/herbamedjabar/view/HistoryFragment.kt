@@ -36,7 +36,9 @@ class HistoryFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        historyAdapter = HistoryAdapter()
+        historyAdapter = HistoryAdapter {
+            (activity as? MainActivity)?.showHistoryDetailFragment(it)
+        }
         binding.historyRecyclerView.adapter = historyAdapter
     }
 

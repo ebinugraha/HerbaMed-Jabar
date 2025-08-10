@@ -2,7 +2,10 @@ package edu.unikom.herbamedjabar.view
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.ImageDecoder
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,9 +29,9 @@ class ScanFragment : Fragment() {
 
     private var processingDialog: ProcessingDialogFragment? = null
 
+    // Launcher untuk izin kamera
     private val requestPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean
-            ->
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isAdded) {
                 if (isGranted) {
                     takePictureLauncher.launch(null)
@@ -39,6 +42,7 @@ class ScanFragment : Fragment() {
             }
         }
 
+    // Launcher untuk mengambil gambar dari kamera
     private val takePictureLauncher =
         registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
             if (bitmap != null) {
@@ -47,11 +51,30 @@ class ScanFragment : Fragment() {
             }
         }
 
+    // Launcher BARU untuk mengambil gambar dari galeri
+    private val galleryLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            if (uri != null) {
+                try {
+                    val bitmap = if (Build.VERSION.SDK_INT < 28) {
+                        MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, uri)
+                    } else {
+                        val source = ImageDecoder.createSource(requireActivity().contentResolver, uri)
+                        ImageDecoder.decodeBitmap(source)
+                    }
+                    binding.plantImageView.setImageBitmap(bitmap)
+                    viewModel.analyzeImage(bitmap)
+                } catch (e: Exception) {
+                    Toast.makeText(context, "Gagal memuat gambar", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         _binding = FragmentScanBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -66,7 +89,9 @@ class ScanFragment : Fragment() {
             }
         }
 
+        // Hubungkan tombol dengan fungsinya masing-masing
         binding.scanButton.setOnClickListener { checkCameraPermissionAndOpenCamera() }
+        binding.btnGallery.setOnClickListener { galleryLauncher.launch("image/*") }
     }
 
     private fun observeViewModel() {
@@ -83,8 +108,10 @@ class ScanFragment : Fragment() {
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Loading -> {
-                    processingDialog = ProcessingDialogFragment()
-                    processingDialog?.show(childFragmentManager, ProcessingDialogFragment.TAG)
+                    if (processingDialog == null || processingDialog?.dialog?.isShowing == false) {
+                        processingDialog = ProcessingDialogFragment()
+                        processingDialog?.show(childFragmentManager, ProcessingDialogFragment.TAG)
+                    }
                 }
                 is UiState.Success,
                 is UiState.Error -> {
@@ -111,7 +138,7 @@ class ScanFragment : Fragment() {
     private fun checkCameraPermissionAndOpenCamera() {
         when {
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) ==
-                PackageManager.PERMISSION_GRANTED -> {
+                    PackageManager.PERMISSION_GRANTED -> {
                 takePictureLauncher.launch(null)
             }
             else -> {

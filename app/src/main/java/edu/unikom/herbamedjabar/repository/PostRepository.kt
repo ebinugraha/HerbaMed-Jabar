@@ -126,15 +126,8 @@ class PostRepository @Inject constructor(
     }
 
     suspend fun deletePost(post: Post) {
-        // 1. Hapus dokumen dari Firestore
+        // Hanya hapus dokumen dari Firestore
         firestore.collection("posts").document(post.id).delete().await()
-
-        // 2. Hapus gambar dari Cloudinary
-        // Ekstrak public ID dari URL gambar
-        val publicId = post.imageUrl.substringAfterLast("/").substringBeforeLast(".")
-        withContext(Dispatchers.IO) {
-            MediaManager.get().uploader().destroy(publicId, null)
-        }
     }
 
 }

@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import edu.unikom.herbamedjabar.adapter.PostAdapter
 import edu.unikom.herbamedjabar.databinding.FragmentForumBinding
@@ -46,11 +47,21 @@ class ForumFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        postAdapter = PostAdapter{
-                postId ->
-            viewModel.toggleLikeOnPost(postId)
-
-        }
+        postAdapter = PostAdapter(
+            onLikeClicked = { postId ->
+                viewModel.toggleLikeOnPost(postId)
+            },
+            onDeleteClicked = { post ->
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Hapus Postingan")
+                    .setMessage("Apakah Anda yakin ingin menghapus postingan ini?")
+                    .setNegativeButton("Batal", null)
+                    .setPositiveButton("Hapus") { _, _ ->
+                        viewModel.deletePost(post)
+                    }
+                    .show()
+            }
+        )
 
     binding.rvPosts.apply {
         adapter = postAdapter

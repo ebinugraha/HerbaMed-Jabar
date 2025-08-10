@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.adapter.PostAdapter
@@ -46,9 +47,22 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        postAdapter = PostAdapter { postId ->
-            viewModel.toggleLikeOnPost(postId)
-        }
+        postAdapter = PostAdapter(
+            onLikeClicked = { postId ->
+                viewModel.toggleLikeOnPost(postId)
+            },
+            onDeleteClicked = { post ->
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Hapus Postingan")
+                    .setMessage("Apakah Anda yakin ingin menghapus postingan ini?")
+                    .setNegativeButton("Batal", null)
+                    .setPositiveButton("Hapus") { _, _ ->
+                        viewModel.deletePost(post)
+                    }
+                    .show()
+            }
+        )
+
         binding.rvMyPosts.apply {
             adapter = postAdapter
             layoutManager = LinearLayoutManager(context)

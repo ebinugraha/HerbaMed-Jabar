@@ -49,6 +49,15 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun deletePost(post: Post) {
+        viewModelScope.launch {
+            try {
+                postRepository.deletePost(post)
+            } catch (e: Exception) {
+            }
+        }
+    }
+
     fun logout() {
         auth.signOut()
     }

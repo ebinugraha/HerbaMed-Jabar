@@ -109,7 +109,6 @@ class ScanFragment : Fragment() {
     }
 
     private fun checkCameraPermissionAndOpenCamera() {
-        // ... (kode ini tidak berubah)
         when {
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) ==
                 PackageManager.PERMISSION_GRANTED -> {

@@ -3,6 +3,7 @@ package edu.unikom.herbamedjabar.adapter
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -10,9 +11,14 @@ import coil.load
 import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.data.ScanHistory
 import edu.unikom.herbamedjabar.databinding.ItemHistoryBinding
+import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
+import org.intellij.markdown.html.HtmlGenerator
+import org.intellij.markdown.parser.MarkdownParser
 import java.io.File
 
-class HistoryAdapter :
+class HistoryAdapter(
+    private val onClick: (ScanHistory) -> Unit
+) :
     ListAdapter<ScanHistory, HistoryAdapter.HistoryViewHolder>(HistoryDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
@@ -28,9 +34,15 @@ class HistoryAdapter :
 
     inner class HistoryViewHolder(private val binding: ItemHistoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(history: ScanHistory, position: Int) {
+        fun bind(history: ScanHistory, position: Int) { // Terima posisi di sini
             binding.apply {
-                historyTextView.text = history.resultText
+                // Menggunakan ID dari layout baru Anda dan data class yang sudah diperbarui
+                val flavour = CommonMarkFlavourDescriptor()
+                val parsedTree =
+                    MarkdownParser(flavour).buildMarkdownTreeFromString(history.resultText)
+                val html = HtmlGenerator(history.resultText, parsedTree, flavour).generateHtml()
+                historyTextView.text =
+                    HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
                 val imageFile = File(history.imagePath)
                 if (imageFile.exists()) {
@@ -40,10 +52,16 @@ class HistoryAdapter :
                     }
                 }
 
+                // --- LOGIKA WARNA WARNI ---
                 val context = binding.root.context
                 val pastelColors = context.resources.getIntArray(R.array.pastel_colors)
                 val color = pastelColors[position % pastelColors.size]
+                // Terapkan warna ke latar belakang item (root layout)
                 binding.root.setBackgroundColor(color)
+
+                itemView.setOnClickListener {
+                    onClick(history)
+                }
             }
         }
     }

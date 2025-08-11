@@ -28,9 +28,8 @@ class HistoryAdapter :
 
     inner class HistoryViewHolder(private val binding: ItemHistoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(history: ScanHistory, position: Int) { // Terima posisi di sini
+        fun bind(history: ScanHistory, position: Int) {
             binding.apply {
-                // Menggunakan ID dari layout baru Anda dan data class yang sudah diperbarui
                 historyTextView.text = history.resultText
 
                 val imageFile = File(history.imagePath)
@@ -41,11 +40,9 @@ class HistoryAdapter :
                     }
                 }
 
-                // --- LOGIKA WARNA WARNI ---
                 val context = binding.root.context
                 val pastelColors = context.resources.getIntArray(R.array.pastel_colors)
                 val color = pastelColors[position % pastelColors.size]
-                // Terapkan warna ke latar belakang item (root layout)
                 binding.root.setBackgroundColor(color)
             }
         }

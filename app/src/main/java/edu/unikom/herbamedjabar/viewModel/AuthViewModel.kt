@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.resumeWithException
 
-// Sealed class untuk merepresentasikan state dari proses otentikasi
 sealed class AuthState {
     object Idle : AuthState()
     object Loading : AuthState()
@@ -85,18 +84,18 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun logoutUser() {
-        _authState.value = AuthState.Loading
-        viewModelScope.launch {
-            try {
-                firebaseAuth.signOut()
-                _authState.postValue(AuthState.Idle)
-            } catch (e: Exception) {
-                _authState.postValue(AuthState.Error(e.message ?: "Signout gagal"))
-
-            }
-        }
-    }
+//    fun logoutUser() {
+//        _authState.value = AuthState.Loading
+//        viewModelScope.launch {
+//            try {
+//                firebaseAuth.signOut()
+//                _authState.postValue(AuthState.Idle)
+//            } catch (e: Exception) {
+//                _authState.postValue(AuthState.Error(e.message ?: "Signout gagal"))
+//
+//            }
+//        }
+//    }
 }
 
 // Extension function untuk menggunakan coroutines dengan Firebase Auth

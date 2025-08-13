@@ -77,8 +77,8 @@ class ProfileFragment : Fragment() {
                 binding.tvEmail.text = it.email ?: "Email Pengguna"
                 binding.ivProfilePicture.load(it.photoUrl) {
                     crossfade(true)
-                    placeholder(R.drawable.ic_user_image2)
-                    error(R.drawable.ic_user_image2)
+                    placeholder(R.drawable.ic_user_image_circular)
+                    error(R.drawable.ic_user_image_circular)
                 }
             }
         }

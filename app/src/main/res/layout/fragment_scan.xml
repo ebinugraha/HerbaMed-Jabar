@@ -272,7 +272,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text=" • Gunakan pencahayaan alami"
+                            android:text="1. Gunakan pencahayaan alami"
                             android:textSize="10sp"
                             android:textStyle="italic"
                             android:textColor="@color/text_blue"
@@ -281,7 +281,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text=" • Fokus pada satu daun utuh"
+                            android:text="2. Fokus pada satu daun utuh"
                             android:textSize="10sp"
                             android:textStyle="italic"
                             android:textColor="@color/text_blue"
@@ -290,7 +290,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text=" • Hindari bayangan dan blur"
+                            android:text="3. Hindari bayangan dan blur"
                             android:textSize="10sp"
                             android:textStyle="italic"
                             android:textColor="@color/text_blue"

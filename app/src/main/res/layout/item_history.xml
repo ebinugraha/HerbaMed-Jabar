@@ -37,17 +37,44 @@
         <TextView
             android:id="@+id/historyTextView"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="14dp"
             android:ellipsize="end"
-            android:maxLines="4"
+            android:maxLines="3"
             android:textColor="@android:color/black"
             android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/containerImage"
+            app:layout_constraintBottom_toTopOf="@id/time_wrapper"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="🌿 **NAMA TANAMAN**\n   - Umum: Jahe\n   - Ilmiah: Zingiber officinale" />
+
+        <LinearLayout
+            android:id="@+id/time_wrapper"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/historyTextView"
+            app:layout_constraintStart_toEndOf="@id/containerImage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="14dp"
+            android:gravity="center_vertical"
+            >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_clock"
+                />
+            <TextView
+                android:id="@+id/time"
+                android:layout_marginStart="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:text="test"
+                />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

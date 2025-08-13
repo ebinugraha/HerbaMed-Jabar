@@ -15,6 +15,9 @@ import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class HistoryAdapter(
     private val onClick: (ScanHistory) -> Unit
@@ -44,6 +47,10 @@ class HistoryAdapter(
                 historyTextView.text =
                     HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
+                val sdf = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+                val date = Date(history.timestamp)
+                time.text = sdf.format(date)
+
                 val imageFile = File(history.imagePath)
                 if (imageFile.exists()) {
                     historyImageView.load(Uri.fromFile(imageFile)) {
@@ -51,13 +58,6 @@ class HistoryAdapter(
                         placeholder(R.drawable.bg_place_holder)
                     }
                 }
-
-                // --- LOGIKA WARNA WARNI ---
-                val context = binding.root.context
-                val pastelColors = context.resources.getIntArray(R.array.pastel_colors)
-                val color = pastelColors[position % pastelColors.size]
-                // Terapkan warna ke latar belakang item (root layout)
-                binding.root.setBackgroundColor(color)
 
                 itemView.setOnClickListener {
                     onClick(history)

@@ -18,7 +18,10 @@ import org.intellij.markdown.parser.MarkdownParser
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PostAdapter(private val onLikeClicked: (String) -> Unit, private val onDeleteClicked: (Post) -> Unit) : ListAdapter<Post, PostAdapter.PostViewHolder>(DiffCallback()) {
+class PostAdapter(
+    private val onLikeClicked: (String) -> Unit,
+    private val onDeleteClicked: (Post) -> Unit
+) : ListAdapter<Post, PostAdapter.PostViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = ItemPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -32,6 +35,7 @@ class PostAdapter(private val onLikeClicked: (String) -> Unit, private val onDel
 
     inner class PostViewHolder(private val binding: ItemPostBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
         fun bind(post: Post) {
             val currentUser = FirebaseAuth.getInstance().currentUser
             binding.apply {
@@ -44,40 +48,47 @@ class PostAdapter(private val onLikeClicked: (String) -> Unit, private val onDel
                     placeholder(R.drawable.bg_place_holder)
                 }
 
+                fun formatMarkdownLists(input: String): String {
+                    return input.replace(
+                        Regex("""(\d+\.\s*)""")
+                    ) { match ->
+                        if (match.range.first == 0) match.value else "\n${match.value}"
+                    }
+                }
+
+                val formattedContent = post.content ?: ""
+                val formattedBenefit = formatMarkdownLists(post.benefit ?: "")
+                val formattedWarning = formatMarkdownLists(post.warning ?: "")
+
                 val flavour = CommonMarkFlavourDescriptor()
-                val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(post.description)
-                val html = HtmlGenerator(post.description, parsedTree, flavour).generateHtml()
+
+                val parsedTreeContent = MarkdownParser(flavour).buildMarkdownTreeFromString(formattedContent)
+                val htmlContent = HtmlGenerator(formattedContent, parsedTreeContent, flavour).generateHtml()
+
+                val parsedTreeBenefit = MarkdownParser(flavour).buildMarkdownTreeFromString(formattedBenefit)
+                val htmlBenefit = HtmlGenerator(formattedBenefit, parsedTreeBenefit, flavour).generateHtml()
+
+                val parsedTreeWarning = MarkdownParser(flavour).buildMarkdownTreeFromString(formattedWarning)
+                val htmlWarning = HtmlGenerator(formattedWarning, parsedTreeWarning, flavour).generateHtml()
 
                 tvPlantName.text = post.plantName
-                tvDescription.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                tvContent.text = HtmlCompat.fromHtml(htmlContent, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                tvManfaat.text = HtmlCompat.fromHtml(htmlBenefit, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                tvEfek.text = HtmlCompat.fromHtml(htmlWarning, HtmlCompat.FROM_HTML_MODE_LEGACY)
                 tvLikeCount.text = "${post.likes.size}"
 
-                // Update ikon like berdasarkan status
-                if (post.likes.contains(currentUser?.uid)) {
-                    ivLike.setImageResource(R.drawable.ic_heart_filled)
-                } else {
-                    ivLike.setImageResource(R.drawable.ic_hearth_outline)
-                }
+                ivLike.setImageResource(
+                    if (post.likes.contains(currentUser?.uid)) R.drawable.ic_heart_filled
+                    else R.drawable.ic_hearth_outline
+                )
 
-                // Set listener klik
-                ivLike.setOnClickListener {
-                    onLikeClicked(post.id)
-                }
+                ivLike.setOnClickListener { onLikeClicked(post.id) }
 
-                // Tampilkan tombol hapus jika post milik user saat ini
-                if (post.userId == currentUser?.uid) {
-                    ivMenuOptions.visibility = View.VISIBLE
-                    ivMenuOptions.setOnClickListener {
-                        onDeleteClicked(post)
-                    }
-                } else {
-                    ivMenuOptions.visibility = View.GONE
-                }
+                ivMenuOptions.visibility = if (post.userId == currentUser?.uid) View.VISIBLE else View.GONE
+                ivMenuOptions.setOnClickListener { onDeleteClicked(post) }
 
-                // Format timestamp
                 val sdf = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
-                val date = Date(post.timestamp)
-                tvPostTimestamp.text = sdf.format(date)
+                tvPostTimestamp.text = sdf.format(Date(post.timestamp))
             }
         }
     }

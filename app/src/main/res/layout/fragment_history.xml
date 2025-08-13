@@ -52,12 +52,12 @@
             android:layout_marginBottom="40dp"
             tools:listitem="@layout/item_history" />
 
-        <TextView
+        <ImageView
             android:id="@+id/emptyHistoryTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="300dp"
+            android:contentDescription="test"
             android:layout_height="wrap_content"
-            android:text="Riwayat pemindaian masih kosong."
-            android:textSize="18sp"
+            android:src="@drawable/group_118"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -262,7 +262,7 @@
 Kebijakan Privasi kami"
             android:textAlignment="center"
             android:textColor="@color/text_muted_foreground"
-            android:textSize="16sp"
+            android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

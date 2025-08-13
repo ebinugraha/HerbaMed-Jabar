@@ -34,21 +34,40 @@
          android:textColor="@android:color/black"
          android:textSize="16sp"
          android:textStyle="bold"
-         app:layout_constraintBottom_toTopOf="@id/tv_post_timestamp"
+         app:layout_constraintBottom_toTopOf="@id/time_wrapper"
          app:layout_constraintEnd_toEndOf="parent"
          app:layout_constraintStart_toEndOf="@id/iv_user_profile"
          app:layout_constraintTop_toTopOf="@id/iv_user_profile"
          tools:text="Username" />
 
-     <TextView
-         android:id="@+id/tv_post_timestamp"
-         android:layout_width="0dp"
-         android:layout_height="wrap_content"
-         android:textSize="12sp"
+     <LinearLayout
+         android:id="@+id/time_wrapper"
          app:layout_constraintBottom_toBottomOf="@id/iv_user_profile"
          app:layout_constraintStart_toStartOf="@id/tv_username"
          app:layout_constraintTop_toBottomOf="@id/tv_username"
-         tools:text="2 hours ago" />
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:orientation="horizontal"
+         android:gravity="center_vertical"
+         >
+         <ImageView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:src="@drawable/ic_clock"
+             />
+         <TextView
+             android:id="@+id/tv_post_timestamp"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_marginStart="4dp"
+             android:textSize="12sp"
+             app:layout_constraintBottom_toBottomOf="@id/iv_user_profile"
+             app:layout_constraintStart_toStartOf="@id/tv_username"
+             app:layout_constraintTop_toBottomOf="@id/tv_username"
+             tools:text="2 hours ago" />
+     </LinearLayout>
+
+
 
      <ImageView
          android:id="@+id/iv_menu_options"
@@ -61,6 +80,7 @@
          app:layout_constraintEnd_toEndOf="parent"
          app:layout_constraintTop_toTopOf="@+id/iv_user_profile"
          tools:visibility="visible" />
+
 
      <ImageView
          android:id="@+id/iv_post_image"
@@ -88,7 +108,7 @@
          <TextView
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
-             android:textSize="10sp"
+             android:textSize="14sp"
              android:text="nama tanaman : "
              />
          <TextView
@@ -96,7 +116,7 @@
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:textColor="@android:color/black"
-             android:textSize="10sp"
+             android:textSize="14sp"
              android:textStyle="bold"
              tools:text="Nama Tanaman" />
      </LinearLayout>
@@ -106,11 +126,97 @@
          android:layout_height="wrap_content"
          android:layout_marginTop="4dp"
          android:ellipsize="end"
+         android:maxLines="0"
          app:layout_constraintEnd_toEndOf="@id/container_post"
          app:layout_constraintStart_toStartOf="@id/container_post"
          app:layout_constraintTop_toBottomOf="@id/container_post"
          tools:text="Ini adalah deskripsi singkat dari postingan tentang tanaman herbal yang sangat bermanfaat untuk kesehatan." />
      <!-- Description -->
+
+     <LinearLayout
+         android:layout_marginTop="10dp"
+         android:id="@+id/content_wrapper"
+         android:layout_width="0dp"
+         android:layout_height="wrap_content"
+         app:layout_constraintEnd_toEndOf="@id/container_post"
+         app:layout_constraintStart_toStartOf="@id/container_post"
+         app:layout_constraintTop_toBottomOf="@id/container_post"
+         android:orientation="vertical"
+         >
+         <TextView
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:text="📝 Deskripsi"
+             android:textSize="14sp"
+             android:textStyle="bold"
+             />
+
+         <TextView
+             android:id="@+id/tv_content"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:textSize="12sp"
+             android:layout_marginTop="4dp"
+             android:text="content"
+             android:textColor="@color/text_muted_foreground"
+             />
+         <TextView
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:text="🩺 Potensi Manfaat &amp; Kegunaan"
+             android:textSize="14sp"
+             android:textStyle="bold"
+             />
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="vertical"
+             android:background="@drawable/custom_card_green_info"
+             android:layout_marginTop="8dp"
+             android:paddingHorizontal="8dp"
+             >
+             <TextView
+                 android:layout_marginStart="12dp"
+                 android:id="@+id/tv_manfaat"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="20dp"
+                 android:textSize="12sp"
+                 android:textColor="#609B5A"
+                 android:text="Manfaat"
+                 />
+         </LinearLayout>
+
+         <TextView
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:text="⚠️ Peringatan &amp; Efek Samping"
+             android:textSize="14sp"
+             android:layout_marginTop="8dp"
+             android:textStyle="bold"
+             />
+
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="vertical"
+             android:background="@drawable/custom_effect_wrapper"
+             android:layout_marginTop="8dp"
+             android:paddingHorizontal="8dp"
+             >
+             <TextView
+                 android:layout_marginStart="12dp"
+                 android:id="@+id/tv_efek"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="20dp"
+                 android:textSize="12sp"
+                 android:textColor="#92400D"
+                 android:text="Manfaat"
+                 />
+         </LinearLayout>
+
+     </LinearLayout>
 
      <!-- Like Button -->
      <ImageView
@@ -119,8 +225,8 @@
          android:layout_height="24dp"
          android:layout_marginTop="16dp"
          android:src="@drawable/ic_heart_filled"
-         app:layout_constraintStart_toStartOf="@id/tv_description"
-         app:layout_constraintTop_toBottomOf="@id/tv_description"
+         app:layout_constraintStart_toStartOf="@id/content_wrapper"
+         app:layout_constraintTop_toBottomOf="@id/content_wrapper"
          />
 
      <TextView

@@ -22,26 +22,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
+        <ImageView
             android:id="@+id/btn_logout"
-            android:layout_width="100dp"
-            android:layout_height="35dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:paddingHorizontal="12dp"
-            android:text="Logout"
-            android:textColor="#F53F3F"
-            android:textSize="9sp"
-            app:backgroundTint="#FFE8E8"
-            app:cornerRadius="8dp"
-            app:icon="@drawable/ic_log_out"
-            app:iconGravity="textStart"
-            app:iconSize="14dp"
-            app:iconTint="#F53F3F"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_menu"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="18dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:strokeColor="#F7BBBC"
-            app:strokeWidth="1dp" />
+            />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/iv_profile_picture"
@@ -61,6 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp"
             android:layout_marginEnd="16dp"
             android:textColor="@color/white"
             android:textSize="18sp"
@@ -75,6 +66,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:textColor="@color/text_muted_foreground"
             android:textSize="14sp"

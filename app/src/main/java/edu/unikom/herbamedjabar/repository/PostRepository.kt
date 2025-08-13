@@ -68,7 +68,8 @@ class PostRepository @Inject constructor(
         userProfilePictureUrl: String?,
         imageUri: Uri,
         plantName: String,
-        description: String
+        description: String,
+        parsedData: Map<String, String>,
     ) {
         val imageUrl = uploadImageToCloudinary(imageUri)
         val postId = firestore.collection("posts").document().id
@@ -80,7 +81,10 @@ class PostRepository @Inject constructor(
             imageUrl = imageUrl,
             plantName = plantName,
             description = description,
-            timestamp = System.currentTimeMillis()
+            timestamp = System.currentTimeMillis(),
+            benefit = parsedData["benefit"],
+            warning = parsedData["warning"],
+            content = parsedData["description"]
         )
         firestore.collection("posts").document(postId).set(newPost).await()
     }

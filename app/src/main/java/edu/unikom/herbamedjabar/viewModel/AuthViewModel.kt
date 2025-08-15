@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -41,6 +42,19 @@ class AuthViewModel @Inject constructor(
                 _authState.postValue(AuthState.Authenticated)
             } catch (e: Exception) {
                 _authState.postValue(AuthState.Error(e.message ?: "Login gagal"))
+            }
+        }
+    }
+
+    fun signInWithGoogleToken(idToken: String) {
+        _authState.value = AuthState.Loading
+        viewModelScope.launch {
+            try {
+                val credential = GoogleAuthProvider.getCredential(idToken, null)
+                firebaseAuth.signInWithCredential(credential).await()
+                _authState.postValue(AuthState.Authenticated)
+            } catch (e: Exception) {
+                _authState.postValue(AuthState.Error(e.message ?: "Login dengan Google gagal"))
             }
         }
     }

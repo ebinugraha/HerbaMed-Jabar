@@ -5,6 +5,8 @@ cloudinaryAndroid = "2.4.0"
 coil = "2.5.0"
 coreSplashscreen = "1.0.1"
 firebaseBom = "34.0.0"
+credentials = "1.5.0"
+googleid = "1.1.1"
 fragmentKtx = "1.6.2"
 generativeai = "0.3.0"
 hiltAndroid = "2.51"
@@ -44,6 +46,9 @@ firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-storage = { module = "com.google.firebase:firebase-storage" }
+credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 generativeai = { module = "com.google.ai.client.generativeai:generativeai", version.ref = "generativeai" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }

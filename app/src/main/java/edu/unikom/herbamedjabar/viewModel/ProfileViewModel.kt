@@ -9,7 +9,6 @@ import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.unikom.herbamedjabar.data.Post
 import edu.unikom.herbamedjabar.repository.PostRepository
-import edu.unikom.herbamedjabar.view.LoginFragment
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -61,8 +60,5 @@ class ProfileViewModel @Inject constructor(
 
     fun logout() {
         auth.signOut()
-
-        val loginFragment = LoginFragment()
-        loginFragment.clearCredential()
     }
 }

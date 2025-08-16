@@ -120,17 +120,6 @@ class LoginFragment : Fragment() {
         }
     }
 
-    fun clearCredential() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val clearRequest = ClearCredentialStateRequest()
-                credentialManager.clearCredentialState(clearRequest)
-            } catch (e: ClearCredentialException) {
-                Log.e(TAG, "Gagal membersihkan kredensial: ${e.localizedMessage}")
-            }
-        }
-    }
-
     private fun observeViewModel() {
         viewModel.authState.observe(viewLifecycleOwner) { state ->
             binding.progressBar.isVisible = state is AuthState.Loading

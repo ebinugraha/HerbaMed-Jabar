@@ -2,11 +2,17 @@ package edu.unikom.herbamedjabar.view
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
+import androidx.credentials.exceptions.ClearCredentialException
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -41,8 +47,18 @@ class ProfileFragment : Fragment() {
 
         binding.btnLogout.setOnClickListener {
             viewModel.logout()
-            startActivity(Intent(requireContext(), AuthActivity::class.java))
-            activity?.finish()
+            viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    val credentialManager = CredentialManager.create(requireContext())
+                    val clearRequest = ClearCredentialStateRequest()
+                    credentialManager.clearCredentialState(clearRequest)
+                } catch (e: ClearCredentialException) {
+                    Log.e("ProfileFragment", "Gagal membersihkan kredensial: ${e.localizedMessage}")
+                } finally {
+                    startActivity(Intent(requireContext(), AuthActivity::class.java))
+                    activity?.finish()
+                }
+            }
         }
     }
 

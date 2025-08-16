@@ -8,15 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.ClearCredentialException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 import dagger.hilt.android.AndroidEntryPoint
 import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.databinding.FragmentLoginBinding
@@ -31,6 +35,7 @@ class LoginFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: AuthViewModel by viewModels()
+
     private lateinit var credentialManager: CredentialManager
 
     override fun onCreateView(
@@ -38,14 +43,16 @@ class LoginFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
-        credentialManager = CredentialManager.create(requireContext())
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        credentialManager = CredentialManager.create(requireContext())
+
         setupClickListeners()
+
         observeViewModel()
     }
 
@@ -70,45 +77,57 @@ class LoginFragment : Fragment() {
     }
 
     private fun launchGoogleSignIn() {
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setServerClientId(getString(R.string.default_web_client_id))
-            .setFilterByAuthorizedAccounts(false)
+        // Create the dialog configuration for the Credential Manager request
+        val signInWithGoogleOption = GetSignInWithGoogleOption
+            .Builder(serverClientId = requireContext().getString(R.string.default_web_client_id))
             .build()
 
+        // Create the Credential Manager request using the configuration created above
         val request = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
+            .addCredentialOption(signInWithGoogleOption)
             .build()
 
-        lifecycleScope.launch {
+        launchCredentialManager(request)
+    }
+
+    private fun launchCredentialManager(request: GetCredentialRequest) {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
+                // Launch Credential Manager UI
                 val result = credentialManager.getCredential(
                     context = requireContext(),
                     request = request
                 )
-                handleSignIn(result.credential)
+
+                // Extract credential from the result returned by Credential Manager
+                createGoogleIdToken(result.credential)
             } catch (e: GetCredentialException) {
-                Log.e("LoginFragment", "Gagal mendapatkan kredensial: ${e.message}", e)
-                Toast.makeText(requireContext(), "Login dengan Google gagal.", Toast.LENGTH_LONG)
-                    .show()
+                Log.e(TAG, "Gagal mendapatkan kredensial pengguna: ${e.localizedMessage}")
             }
         }
     }
 
-    private fun handleSignIn(credential: androidx.credentials.Credential) {
-        if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-            try {
-                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                val idToken = googleIdTokenCredential.idToken
-                viewModel.signInWithGoogleToken(idToken)
-            } catch (e: Exception) {
-                Log.e("LoginFragment", "Gagal memproses kredensial: ${e.message}", e)
-                Toast.makeText(requireContext(), "Gagal memproses login Google.", Toast.LENGTH_LONG)
-                    .show()
-            }
+    private fun createGoogleIdToken(credential: Credential) {
+        // Check if credential is of type Google ID
+        if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            // Create Google ID Token
+            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+
+            // Sign in to Firebase with using the token
+            viewModel.signInWithGoogleToken(googleIdTokenCredential.idToken)
         } else {
-            Log.w("LoginFragment", "Kredensial Google tidak valid.")
-            Toast.makeText(requireContext(), "Kredensial Google tidak valid.", Toast.LENGTH_LONG)
-                .show()
+            Log.w(TAG, "Kredensial tidak sesuai dengan Google ID Token")
+        }
+    }
+
+    fun clearCredential() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val clearRequest = ClearCredentialStateRequest()
+                credentialManager.clearCredentialState(clearRequest)
+            } catch (e: ClearCredentialException) {
+                Log.e(TAG, "Gagal membersihkan kredensial: ${e.localizedMessage}")
+            }
         }
     }
 
@@ -139,5 +158,9 @@ class LoginFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val TAG = "LoginFragment"
     }
 }

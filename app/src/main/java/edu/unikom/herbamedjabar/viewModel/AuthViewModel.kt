@@ -12,6 +12,7 @@ import com.google.firebase.auth.userProfileChangeRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 sealed class AuthState {
@@ -97,19 +98,6 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
-
-//    fun logoutUser() {
-//        _authState.value = AuthState.Loading
-//        viewModelScope.launch {
-//            try {
-//                firebaseAuth.signOut()
-//                _authState.postValue(AuthState.Idle)
-//            } catch (e: Exception) {
-//                _authState.postValue(AuthState.Error(e.message ?: "Signout gagal"))
-//
-//            }
-//        }
-//    }
 }
 
 // Extension function untuk menggunakan coroutines dengan Firebase Auth
@@ -117,7 +105,7 @@ suspend fun <T> com.google.android.gms.tasks.Task<T>.await(): T {
     return kotlinx.coroutines.suspendCancellableCoroutine { cont ->
         addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                cont.resume(task.result, null)
+                cont.resume(task.result)
             } else {
                 cont.resumeWithException(task.exception!!)
             }

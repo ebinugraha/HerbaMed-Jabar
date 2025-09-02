@@ -10,12 +10,12 @@ import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
+import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.databinding.FragmentResultBinding
+import edu.unikom.herbamedjabar.repository.AnalysisResult
+import edu.unikom.herbamedjabar.util.MarkdownUtils
 import edu.unikom.herbamedjabar.viewModel.ResultViewModel
 import java.io.File
-import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
-import org.intellij.markdown.html.HtmlGenerator
-import org.intellij.markdown.parser.MarkdownParser
 
 @AndroidEntryPoint
 class ResultFragment : Fragment() {
@@ -45,26 +45,40 @@ class ResultFragment : Fragment() {
 
     private fun setupUI() {
         val imagePath = arguments?.getString(ARG_IMAGE_PATH)
-        val resultText = arguments?.getString(ARG_RESULT_TEXT)
+        val plantName = arguments?.getString(ARG_PLANT_NAME).orEmpty()
+        val content = arguments?.getString(ARG_CONTENT).orEmpty()
+        val benefit = arguments?.getString(ARG_BENEFIT).orEmpty()
+        val warning = arguments?.getString(ARG_WARNING).orEmpty()
 
-        if (imagePath != null) {
-            val imageFile = File(imagePath)
-            if (imageFile.exists()) {
-                binding.resultImageView.setImageURI(Uri.fromFile(imageFile))
+        binding.apply {
+            plantNameTextView.text = plantName
+            contentTextView.text = HtmlCompat.fromHtml(
+                MarkdownUtils.parseMarkdownToHtml(content), HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+            benefitTextView.text = HtmlCompat.fromHtml(
+                MarkdownUtils.parseMarkdownToHtml(benefit), HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+            warningTextView.text = HtmlCompat.fromHtml(
+                MarkdownUtils.parseMarkdownToHtml(warning), HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+            benefitBanner.visibility = if (benefit.isBlank()) View.GONE else View.VISIBLE
+            benefitTextView.visibility = if (benefit.isBlank()) View.GONE else View.VISIBLE
+            warningBanner.visibility = if (warning.isBlank()) View.GONE else View.VISIBLE
+            warningTextView.visibility = if (warning.isBlank()) View.GONE else View.VISIBLE
+            if (imagePath != null) {
+                val imageFile = File(imagePath)
+                if (imageFile.exists()) {
+                    resultImageView.setImageURI(Uri.fromFile(imageFile))
+                } else {
+                    resultImageView.setImageResource(R.drawable.bg_place_holder)
+                }
             }
-        }
-
-        if (resultText != null) {
-            val flavour = CommonMarkFlavourDescriptor()
-            val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(resultText)
-            val html = HtmlGenerator(resultText, parsedTree, flavour).generateHtml()
-            binding.resultTextView.text =
-                HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
+            resultImageView.contentDescription = root.context.getString(R.string.cd_plant_image_of, plantName)
         }
     }
 
     private fun setupListeners() {
-        binding.backButton.setOnClickListener { activity?.supportFragmentManager?.popBackStack() }
+        binding.topAppBar.setNavigationOnClickListener { activity?.supportFragmentManager?.popBackStack() }
 
         binding.scanAgainButton.setOnClickListener {
             parentFragmentManager.setFragmentResult(
@@ -79,7 +93,11 @@ class ResultFragment : Fragment() {
             val resultText = arguments?.getString(ARG_RESULT_TEXT)
 
             if (imagePath == null || resultText == null) {
-                Toast.makeText(requireContext(), "Data tidak lengkap untuk diposting", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.error_incomplete_post_data),
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
@@ -105,11 +123,16 @@ class ResultFragment : Fragment() {
 
         viewModel.postResult.observe(viewLifecycleOwner) { result ->
             result.onSuccess {
-                Toast.makeText(requireContext(), "Berhasil diposting ke forum!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Berhasil diposting ke forum!", Toast.LENGTH_SHORT)
+                    .show()
                 // Kembali ke halaman scan setelah berhasil
                 activity?.supportFragmentManager?.popBackStack()
             }.onFailure {
-                Toast.makeText(requireContext(), "Gagal memposting: ${it.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Gagal memposting: ${it.message}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
@@ -122,15 +145,24 @@ class ResultFragment : Fragment() {
     companion object {
         private const val ARG_IMAGE_PATH = "image_path"
         private const val ARG_RESULT_TEXT = "result_text"
+        private const val ARG_PLANT_NAME = "plant_name"
+        private const val ARG_BENEFIT = "benefit"
+        private const val ARG_WARNING = "warning"
+        private const val ARG_CONTENT = "content"
 
-        fun newInstance(imagePath: String, resultText: String): ResultFragment {
+        fun newInstance(
+            args: AnalysisResult
+        ): ResultFragment {
             val fragment = ResultFragment()
-            val args =
-                Bundle().apply {
-                    putString(ARG_IMAGE_PATH, imagePath)
-                    putString(ARG_RESULT_TEXT, resultText)
-                }
-            fragment.arguments = args
+            val bundle = Bundle().apply {
+                putString(ARG_IMAGE_PATH, args.imagePath)
+                putString(ARG_RESULT_TEXT, args.resultText)
+                putString(ARG_PLANT_NAME, args.plantName)
+                putString(ARG_BENEFIT, args.benefit)
+                putString(ARG_WARNING, args.warning)
+                putString(ARG_CONTENT, args.content)
+            }
+            fragment.arguments = bundle
             return fragment
         }
     }

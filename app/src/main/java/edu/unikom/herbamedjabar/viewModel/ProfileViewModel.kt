@@ -40,21 +40,14 @@ class ProfileViewModel @Inject constructor(
 
     fun toggleLikeOnPost(postId: String) {
         viewModelScope.launch {
-            try {
-                val userId = auth.currentUser?.uid ?: return@launch
-                postRepository.toggleLike(postId, userId)
-            } catch (e: Exception) {
-                // Handle error jika diperlukan
-            }
+            val userId = auth.currentUser?.uid ?: return@launch
+            postRepository.toggleLike(postId, userId)
         }
     }
 
     fun deletePost(post: Post) {
         viewModelScope.launch {
-            try {
-                postRepository.deletePost(post)
-            } catch (e: Exception) {
-            }
+            postRepository.deletePost(post)
         }
     }
 

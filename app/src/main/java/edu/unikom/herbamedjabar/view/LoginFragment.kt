@@ -8,13 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.ClearCredentialException
-import androidx.credentials.exceptions.GetCredentialException
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -39,7 +36,8 @@ class LoginFragment : Fragment() {
     private lateinit var credentialManager: CredentialManager
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
@@ -93,27 +91,23 @@ class LoginFragment : Fragment() {
     private fun launchCredentialManager(request: GetCredentialRequest) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                // Launch Credential Manager UI
-                val result = credentialManager.getCredential(
+                val credential = credentialManager.getCredential(
                     context = requireContext(),
                     request = request
-                )
-
-                // Extract credential from the result returned by Credential Manager
-                createGoogleIdToken(result.credential)
-            } catch (e: GetCredentialException) {
+                ).credential
+                createGoogleIdToken(credential)
+            } catch (e: androidx.credentials.exceptions.NoCredentialException) {
+                Toast.makeText(requireContext(), "Tidak ada kredensial yang tersedia.", Toast.LENGTH_SHORT).show()
+                Log.w(TAG, "NoCredentialException: ${e.localizedMessage}")
+            } catch (e: androidx.credentials.exceptions.GetCredentialException) {
                 Log.e(TAG, "Gagal mendapatkan kredensial pengguna: ${e.localizedMessage}")
             }
         }
     }
 
     private fun createGoogleIdToken(credential: Credential) {
-        // Check if credential is of type Google ID
         if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-            // Create Google ID Token
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-
-            // Sign in to Firebase with using the token
             viewModel.signInWithGoogleToken(googleIdTokenCredential.idToken)
         } else {
             Log.w(TAG, "Kredensial tidak sesuai dengan Google ID Token")

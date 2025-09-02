@@ -1,10 +1,9 @@
 import java.util.Properties
-import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    kotlin("kapt")
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.gms)
     alias(libs.plugins.kotlin.parcelize)
@@ -12,7 +11,7 @@ plugins {
 
 android {
     namespace = "edu.unikom.herbamedjabar"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "edu.unikom.herbamedjabar"
@@ -27,7 +26,7 @@ android {
         val properties = Properties()
         val localPropertiesFile = rootProject.file("local.properties")
         if (localPropertiesFile.exists()) {
-            properties.load(FileInputStream(localPropertiesFile))
+            localPropertiesFile.inputStream().use(properties::load)
         }
 
         val apiKey = properties.getProperty("apiKey", "")
@@ -45,23 +44,23 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
+        buildConfig = true
         viewBinding = true
-        // buildConfig tidak lagi diperlukan untuk ini
     }
 
+    sourceSets.getByName("androidTest") {
+        assets.srcDir("$projectDir/schemas")
+    }
 }
 
 dependencies {
 
-//    cloudinary
+    // Cloudinary
     implementation(libs.cloudinary.android)
     implementation(libs.androidx.core.splashscreen)
 
@@ -80,6 +79,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    debugImplementation(libs.firebase.appcheck.debug)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -95,6 +95,7 @@ dependencies {
 
     // Coroutines untuk menangani proses background (seperti panggilan API)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     // Coil untuk memuat gambar dengan mudah
     implementation(libs.coil)
@@ -106,10 +107,10 @@ dependencies {
 
     // Dagger - Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
 
     implementation(libs.androidx.room.runtime)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
     // Dukungan Room untuk Coroutines
     implementation(libs.androidx.room.ktx)
 
@@ -117,7 +118,15 @@ dependencies {
     implementation(libs.markdown)
     implementation(libs.circleimageview)
 }
-// Tambahkan ini di bagian paling bawah file
-kapt {
-    correctErrorTypes = true
+kotlin {
+    jvmToolchain(17)
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
+}
+
+ksp {
+    arg("room.incremental", "true")
+    arg("room.generateKotlin", "true")
+    arg("room.schemaLocation", "$projectDir/schemas")
 }

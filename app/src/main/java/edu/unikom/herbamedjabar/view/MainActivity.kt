@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.databinding.ActivityMainBinding
+import edu.unikom.herbamedjabar.repository.AnalysisResult
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -39,32 +40,21 @@ class MainActivity : AppCompatActivity() {
             finish()
             return
         }
-
-        if (savedInstanceState == null) {
-            // Tampilkan fragment awal (ScanFragment)
-            setCurrentFragment(ForumFragment(), false)
-        }
-
         binding.navView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_scan -> {
-                    setCurrentFragment(ScanFragment(), false)
-                    true
-                }
-                R.id.navigation_forum -> {
-                    setCurrentFragment(ForumFragment(), false)
-                    true
-                }
-                R.id.navigation_history -> {
-                    setCurrentFragment(HistoryFragment(), false)
-                    true
-                }
-                R.id.navigation_profile -> {
-                    setCurrentFragment(ProfileFragment(), false)
-                    true
-                }
-                else -> false
+            val fragment = when (item.itemId) {
+                R.id.navigation_scan -> ScanFragment()
+                R.id.navigation_forum -> ForumFragment()
+                R.id.navigation_history -> HistoryFragment()
+                R.id.navigation_profile -> ProfileFragment()
+                else -> null
             }
+            fragment?.let {
+                setCurrentFragment(it, false)
+                true
+            } ?: false
+        }
+        if (savedInstanceState == null) {
+            binding.navView.selectedItemId = R.id.navigation_forum
         }
 
         supportFragmentManager.addOnBackStackChangedListener {
@@ -87,10 +77,10 @@ class MainActivity : AppCompatActivity() {
         transaction.commit()
     }
 
-    // Fungsi publik untuk dipanggil dari ScanFragment
-    fun showResultFragment(imagePath: String, resultText: String) {
-        val resultFragment = ResultFragment.newInstance(imagePath, resultText)
-        // Ganti fragment dan tambahkan ke back stack agar bisa kembali
+    fun showResultFragment(
+        args: AnalysisResult
+    ) {
+        val resultFragment = ResultFragment.newInstance(args)
         setCurrentFragment(resultFragment, true)
     }
 

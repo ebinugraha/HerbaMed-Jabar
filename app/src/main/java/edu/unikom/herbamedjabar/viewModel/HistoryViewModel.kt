@@ -8,9 +8,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val plantRepository: PlantRepository
+    plantRepository: PlantRepository
 ) : ViewModel() {
 
     val allHistory = plantRepository.getAllHistory().asLiveData()
-
 }

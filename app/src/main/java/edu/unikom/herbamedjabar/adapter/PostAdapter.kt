@@ -7,20 +7,18 @@ import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.imageLoader
 import coil.load
 import com.google.firebase.auth.FirebaseAuth
 import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.data.Post
 import edu.unikom.herbamedjabar.databinding.ItemPostBinding
-import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
-import org.intellij.markdown.html.HtmlGenerator
-import org.intellij.markdown.parser.MarkdownParser
-import java.text.SimpleDateFormat
-import java.util.*
+import edu.unikom.herbamedjabar.util.MarkdownUtils
 
 class PostAdapter(
     private val onLikeClicked: (String) -> Unit,
-    private val onDeleteClicked: (Post) -> Unit
+    private val onDeleteClicked: (Post) -> Unit,
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 ) : ListAdapter<Post, PostAdapter.PostViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -37,58 +35,66 @@ class PostAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(post: Post) {
-            val currentUser = FirebaseAuth.getInstance().currentUser
-            binding.apply {
-                tvUsername.text = post.username
-                ivUserProfile.load(post.userProfilePictureUrl) {
-                    placeholder(R.drawable.ic_user_image)
-                    error(R.drawable.ic_user_image)
-                }
-                ivPostImage.load(post.imageUrl) {
-                    placeholder(R.drawable.bg_place_holder)
-                }
-
-                fun formatMarkdownLists(input: String): String {
-                    return input.replace(
-                        Regex("""(\d+\.\s*)""")
-                    ) { match ->
-                        if (match.range.first == 0) match.value else "\n${match.value}"
-                    }
-                }
-
-                val formattedContent = post.content ?: ""
-                val formattedBenefit = formatMarkdownLists(post.benefit ?: "")
-                val formattedWarning = formatMarkdownLists(post.warning ?: "")
-
-                val flavour = CommonMarkFlavourDescriptor()
-
-                val parsedTreeContent = MarkdownParser(flavour).buildMarkdownTreeFromString(formattedContent)
-                val htmlContent = HtmlGenerator(formattedContent, parsedTreeContent, flavour).generateHtml()
-
-                val parsedTreeBenefit = MarkdownParser(flavour).buildMarkdownTreeFromString(formattedBenefit)
-                val htmlBenefit = HtmlGenerator(formattedBenefit, parsedTreeBenefit, flavour).generateHtml()
-
-                val parsedTreeWarning = MarkdownParser(flavour).buildMarkdownTreeFromString(formattedWarning)
-                val htmlWarning = HtmlGenerator(formattedWarning, parsedTreeWarning, flavour).generateHtml()
-
-                tvPlantName.text = post.plantName
-                tvContent.text = HtmlCompat.fromHtml(htmlContent, HtmlCompat.FROM_HTML_MODE_LEGACY)
-                tvManfaat.text = HtmlCompat.fromHtml(htmlBenefit, HtmlCompat.FROM_HTML_MODE_LEGACY)
-                tvEfek.text = HtmlCompat.fromHtml(htmlWarning, HtmlCompat.FROM_HTML_MODE_LEGACY)
-                tvLikeCount.text = "${post.likes.size}"
-
-                ivLike.setImageResource(
-                    if (post.likes.contains(currentUser?.uid)) R.drawable.ic_heart_filled
-                    else R.drawable.ic_hearth_outline
+            val currentUser = auth.currentUser
+            binding.tvUsername.text = post.username
+            binding.ivUserProfile.load(post.userProfilePictureUrl, binding.root.context.imageLoader) {
+                crossfade(true)
+                placeholder(R.drawable.ic_user_image)
+                error(R.drawable.ic_user_image)
+                fallback(R.drawable.ic_user_image)
+            }
+            binding.ivPostImage.load(post.imageUrl, binding.root.context.imageLoader) {
+                crossfade(true)
+                placeholder(R.drawable.bg_place_holder)
+                error(R.drawable.bg_place_holder)
+                fallback(R.drawable.bg_place_holder)
+            }
+            binding.tvPlantName.text = post.plantName
+            binding.tvContent.text = HtmlCompat.fromHtml(
+                MarkdownUtils.parseMarkdownToHtml(post.content), HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+            binding.tvManfaat.text = HtmlCompat.fromHtml(
+                MarkdownUtils.parseMarkdownToHtml(post.benefit, true),
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+            binding.tvEfek.text = HtmlCompat.fromHtml(
+                MarkdownUtils.parseMarkdownToHtml(post.warning, true),
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+            binding.tvManfaat.visibility = if (post.benefit.isNullOrBlank()) View.GONE else View.VISIBLE
+            binding.tvEfek.visibility = if (post.warning.isNullOrBlank()) View.GONE else View.VISIBLE
+            binding.tvLikeCount.text = "${post.likes.size}"
+            val likedByMe = currentUser?.uid?.let(post.likes::contains) == true
+            binding.ivLike.setImageResource(if (likedByMe) R.drawable.ic_heart_filled else R.drawable.ic_heart_outline)
+            binding.ivLike.setOnClickListener {
+                it.isEnabled = false
+                onLikeClicked(post.id)
+                it.postDelayed({ it.isEnabled = true }, 400)
+            }
+            binding.ivMenuOptions.visibility =
+                if (post.userId == currentUser?.uid) View.VISIBLE else View.GONE
+            binding.ivMenuOptions.setOnClickListener { onDeleteClicked(post) }
+            val tsMillis = if (post.timestamp in 1 until 1_000_000_000_000L) post.timestamp * 1000 else post.timestamp
+            binding.tvPostTimestamp.text = if (tsMillis > 0) {
+                android.text.format.DateUtils.formatDateTime(
+                    binding.root.context,
+                    tsMillis,
+                    android.text.format.DateUtils.FORMAT_SHOW_DATE or
+                        android.text.format.DateUtils.FORMAT_SHOW_YEAR or
+                        android.text.format.DateUtils.FORMAT_SHOW_TIME
                 )
-
-                ivLike.setOnClickListener { onLikeClicked(post.id) }
-
-                ivMenuOptions.visibility = if (post.userId == currentUser?.uid) View.VISIBLE else View.GONE
-                ivMenuOptions.setOnClickListener { onDeleteClicked(post) }
-
-                val sdf = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
-                tvPostTimestamp.text = sdf.format(Date(post.timestamp))
+            } else {
+                ""
+            }
+            binding.ivUserProfile.contentDescription =
+                binding.root.context.getString(R.string.cd_user_profile_of, post.username)
+            binding.ivPostImage.contentDescription = binding.root.context.getString(
+                R.string.cd_plant_image_of, post.plantName
+            )
+            binding.ivLike.contentDescription = if (likedByMe) {
+                binding.root.context.getString(R.string.cd_liked)
+            } else {
+                binding.root.context.getString(R.string.cd_like)
             }
         }
     }

@@ -9,14 +9,14 @@ import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import coil.imageLoader
 import coil.load
 import dagger.hilt.android.AndroidEntryPoint
+import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.data.ScanHistory
 import edu.unikom.herbamedjabar.databinding.FragmentHistoryDetailBinding
+import edu.unikom.herbamedjabar.util.MarkdownUtils
 import edu.unikom.herbamedjabar.viewModel.HistoryDetailViewModel
-import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
-import org.intellij.markdown.html.HtmlGenerator
-import org.intellij.markdown.parser.MarkdownParser
 import java.io.File
 
 @AndroidEntryPoint
@@ -38,7 +38,8 @@ class HistoryDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val history = if (Build.VERSION.SDK_INT < 33) {
+        val history = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            @Suppress("DEPRECATION")
             arguments?.getParcelable(EXTRA_HISTORY)
         } else {
             arguments?.getParcelable(EXTRA_HISTORY, ScanHistory::class.java)
@@ -53,22 +54,34 @@ class HistoryDetailFragment : Fragment() {
     }
 
     private fun setupView(history: ScanHistory) {
-        val flavour = CommonMarkFlavourDescriptor()
-        val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(history.resultText)
-        val html = HtmlGenerator(history.resultText, parsedTree, flavour).generateHtml()
-        binding.resultTextView.text =
-            HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
-
         val imageFile = File(history.imagePath)
-        if (imageFile.exists()) {
-            binding.resultImageView.load(Uri.fromFile(imageFile)) {
+        binding.apply {
+            plantNameTextView.text = history.plantName
+            contentTextView.text = HtmlCompat.fromHtml(
+                MarkdownUtils.parseMarkdownToHtml(history.content), HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+            benefitTextView.text = HtmlCompat.fromHtml(
+                MarkdownUtils.parseMarkdownToHtml(history.benefit), HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+            warningTextView.text = HtmlCompat.fromHtml(
+                MarkdownUtils.parseMarkdownToHtml(history.warning), HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+            benefitBanner.visibility = if (history.benefit.isBlank()) View.GONE else View.VISIBLE
+            benefitTextView.visibility = if (history.benefit.isBlank()) View.GONE else View.VISIBLE
+            warningBanner.visibility = if (history.warning.isBlank()) View.GONE else View.VISIBLE
+            warningTextView.visibility = if (history.warning.isBlank()) View.GONE else View.VISIBLE
+            resultImageView.load(
+                if (imageFile.exists()) Uri.fromFile(imageFile) else R.drawable.bg_place_holder,
+                binding.root.context.imageLoader
+            ) {
                 crossfade(true)
             }
+            resultImageView.contentDescription = root.context.getString(R.string.cd_plant_image_of, history.plantName)
         }
     }
 
     private fun setupAction(history: ScanHistory) {
-        binding.backButton.setOnClickListener {
+        binding.topAppBar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
         }
         binding.deleteButton.setOnClickListener {

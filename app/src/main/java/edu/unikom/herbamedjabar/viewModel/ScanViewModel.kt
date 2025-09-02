@@ -29,15 +29,28 @@ class ScanViewModel @Inject constructor(
     private val _navigateToResult = MutableLiveData<AnalysisResult?>()
     val navigateToResult: LiveData<AnalysisResult?> = _navigateToResult
 
+    data class ScanStats(val total: Int = 0, val herbal: Int = 0, val nonHerbal: Int = 0)
+
+    private val _scanStats = MutableLiveData(ScanStats())
+    val scanStats: LiveData<ScanStats> = _scanStats
+
     fun analyzeImage(bitmap: Bitmap) {
+        if (_uiState.value is UiState.Loading) return
         _uiState.value = UiState.Loading
         viewModelScope.launch {
             val result = analyzePlantUseCase(bitmap)
             result.onSuccess { analysisResult ->
-                _uiState.postValue(UiState.Success)
-                _navigateToResult.postValue(analysisResult)
+                _uiState.value = UiState.Success
+                _navigateToResult.value = analysisResult
+                val stats = _scanStats.value ?: ScanStats()
+                val newStats = if (analysisResult.isHerbal) {
+                    stats.copy(total = stats.total + 1, herbal = stats.herbal + 1)
+                } else {
+                    stats.copy(total = stats.total + 1, nonHerbal = stats.nonHerbal + 1)
+                }
+                _scanStats.value = newStats
             }.onFailure { error ->
-                _uiState.postValue(UiState.Error(error.message ?: "Terjadi kesalahan tidak diketahui"))
+                _uiState.value = UiState.Error(error.message ?: "Terjadi kesalahan tidak diketahui")
             }
         }
     }

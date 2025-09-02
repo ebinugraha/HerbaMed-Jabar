@@ -3,23 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/iconCardView"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
-            android:layout_gravity="center"
-            app:lottie_rawRes="@raw/leaf_anim"
-            app:lottie_autoPlay="true"
-            app:layout_constraintBottom_toTopOf="@id/titleTextView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"/>
-
-
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/iconCardView"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/titleTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:lottie_autoPlay="true"
+        app:lottie_rawRes="@raw/leaf_anim" />
 
 
     <TextView
@@ -27,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Menganalisis Tanaman..."
+        android:text="@string/processing_dialog_title"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -41,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="AI sedang mengidentifikasi jenis tanaman herbal"
+        android:text="@string/processing_dialog_subtitle"
         android:textColor="#333333"
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@id/progressBar"
@@ -56,6 +53,9 @@
         android:layout_height="8dp"
         android:layout_marginHorizontal="48dp"
         android:layout_marginTop="32dp"
+        android:accessibilityLiveRegion="polite"
+        android:contentDescription="@string/loading"
+        android:importantForAccessibility="yes"
         android:indeterminate="false"
         android:progressDrawable="@drawable/custom_progress_bar"
         app:layout_constraintBottom_toTopOf="@id/progressTextView"
@@ -76,6 +76,6 @@
         app:layout_constraintEnd_toEndOf="@id/progressBar"
         app:layout_constraintStart_toStartOf="@id/progressBar"
         app:layout_constraintTop_toBottomOf="@id/progressBar"
-        tools:text="76%" />
+        tools:text="@string/processing_dialog_progress_sample" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

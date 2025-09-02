@@ -10,10 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.adapter.PostAdapter
 import edu.unikom.herbamedjabar.databinding.FragmentForumBinding
 import edu.unikom.herbamedjabar.viewModel.ForumViewModel
-import edu.unikom.herbamedjabar.R
+
 @AndroidEntryPoint
 class ForumFragment : Fragment() {
 
@@ -24,11 +25,11 @@ class ForumFragment : Fragment() {
     private lateinit var postAdapter: PostAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentForumBinding.inflate(inflater, container, false)
-
 
         return binding.root
     }
@@ -43,7 +44,6 @@ class ForumFragment : Fragment() {
             val bottomNav = activity?.findViewById<BottomNavigationView>(R.id.nav_view)
             bottomNav?.selectedItemId = R.id.navigation_scan
         }
-
     }
 
     private fun setupRecyclerView() {
@@ -63,10 +63,10 @@ class ForumFragment : Fragment() {
             }
         )
 
-    binding.rvPosts.apply {
-        adapter = postAdapter
-        layoutManager = LinearLayoutManager(context)
-    }
+        binding.rvPosts.apply {
+            adapter = postAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
     }
 
     private fun observeViewModel() {

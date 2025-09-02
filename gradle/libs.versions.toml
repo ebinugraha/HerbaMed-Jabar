@@ -1,31 +1,32 @@
 [versions]
-agp = "8.12.0"
-cameraxVersion = "1.3.1"
-cloudinaryAndroid = "2.4.0"
-coil = "2.5.0"
+agp = "8.12.2"
+cameraxVersion = "1.4.2"
+cloudinaryAndroid = "3.1.1"
+coil = "2.7.0"
 coreSplashscreen = "1.0.1"
-firebaseBom = "34.0.0"
+firebaseBom = "34.2.0"
 credentials = "1.5.0"
 googleid = "1.1.1"
-fragmentKtx = "1.6.2"
-generativeai = "0.3.0"
-hiltAndroid = "2.51"
-kotlin = "2.0.21"
-coreKtx = "1.16.0"
+fragmentKtx = "1.8.9"
+generativeai = "0.9.0"
+hiltAndroid = "2.57.1"
+kotlin = "2.2.10"
+coreKtx = "1.17.0"
 junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
 appcompat = "1.7.1"
-kotlinxCoroutinesAndroid = "1.7.3"
-lifecycleKtx = "2.7.0"
-lottie = "5.0.3"
+kotlinxCoroutinesAndroid = "1.10.2"
+lifecycleKtx = "2.9.3"
+lottie = "6.6.7"
 material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
-roomKtx = "2.6.1"
+roomKtx = "2.7.2"
 markdown = "0.7.3"
 circleimageview = "3.1.0"
 gms = "4.4.3"
+ksp = "2.2.10-2.0.2"
 
 [libraries]
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraxVersion" }
@@ -46,6 +47,7 @@ firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-storage = { module = "com.google.firebase:firebase-storage" }
+firebase-appcheck-debug = { group = "com.google.firebase", name = "firebase-appcheck-debug" }
 credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
@@ -57,6 +59,7 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesAndroid" }
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
@@ -70,4 +73,4 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 gms = { id = "com.google.gms.google-services", version.ref = "gms" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
-
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

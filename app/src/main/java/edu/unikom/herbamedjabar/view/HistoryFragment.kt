@@ -21,7 +21,8 @@ class HistoryFragment : Fragment() {
     private val binding get() = _binding!!
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentHistoryBinding.inflate(inflater, container, false)
@@ -40,18 +41,15 @@ class HistoryFragment : Fragment() {
             (activity as? MainActivity)?.showHistoryDetailFragment(it)
         }
         binding.historyRecyclerView.adapter = historyAdapter
+        binding.historyRecyclerView.setHasFixedSize(true)
     }
 
     private fun observeViewModel() {
         viewModel.allHistory.observe(viewLifecycleOwner) { historyList ->
-            if (historyList.isEmpty()) {
-                binding.historyRecyclerView.visibility = View.GONE
-                binding.emptyHistoryTextView.visibility = View.VISIBLE
-            } else {
-                binding.historyRecyclerView.visibility = View.VISIBLE
-                binding.emptyHistoryTextView.visibility = View.GONE
-                historyAdapter.submitList(historyList)
-            }
+            val isEmpty = historyList.isEmpty()
+            binding.historyRecyclerView.visibility = if (isEmpty) View.GONE else View.VISIBLE
+            binding.emptyHistoryImageView.visibility = if (isEmpty) View.VISIBLE else View.GONE
+            if (!isEmpty) historyAdapter.submitList(historyList)
         }
     }
 

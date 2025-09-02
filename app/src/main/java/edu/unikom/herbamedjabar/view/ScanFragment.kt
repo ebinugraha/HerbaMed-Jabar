@@ -14,10 +14,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import edu.unikom.herbamedjabar.databinding.FragmentScanBinding
 import edu.unikom.herbamedjabar.viewModel.ScanViewModel
 import edu.unikom.herbamedjabar.viewModel.UiState
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class ScanFragment : Fragment() {
@@ -29,7 +32,7 @@ class ScanFragment : Fragment() {
 
     private var processingDialog: ProcessingDialogFragment? = null
 
-    // Launcher untuk izin kamera
+    // Camera permission launcher
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isAdded) {
@@ -42,7 +45,7 @@ class ScanFragment : Fragment() {
             }
         }
 
-    // Launcher untuk mengambil gambar dari kamera
+    // Camera image capture launcher
     private val takePictureLauncher =
         registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
             if (bitmap != null) {
@@ -51,20 +54,32 @@ class ScanFragment : Fragment() {
             }
         }
 
-    // Launcher BARU untuk mengambil gambar dari galeri
+    // Gallery image picker launcher
     private val galleryLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri != null) {
                 try {
-                    val bitmap = if (Build.VERSION.SDK_INT < 28) {
-                        MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, uri)
-                    } else {
-                        val source = ImageDecoder.createSource(requireActivity().contentResolver, uri)
-                        ImageDecoder.decodeBitmap(source)
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        val bitmap = withContext(kotlinx.coroutines.Dispatchers.IO) {
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                                @Suppress("DEPRECATION")
+                                MediaStore.Images.Media.getBitmap(
+                                    requireContext().contentResolver,
+                                    uri
+                                )
+                            } else {
+                                val source =
+                                    ImageDecoder.createSource(
+                                        requireContext().contentResolver,
+                                        uri
+                                    )
+                                ImageDecoder.decodeBitmap(source)
+                            }
+                        }
+                        binding.plantImageView.setImageBitmap(bitmap)
+                        viewModel.analyzeImage(bitmap)
                     }
-                    binding.plantImageView.setImageBitmap(bitmap)
-                    viewModel.analyzeImage(bitmap)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     Toast.makeText(context, "Gagal memuat gambar", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -83,28 +98,42 @@ class ScanFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeViewModel()
 
+        val fullText = getString(edu.unikom.herbamedjabar.R.string.herbamed)
+        val medStart = fullText.indexOf("Med")
+        val medEnd = if (medStart >= 0) medStart + MED_SUBSTRING_LENGTH else medStart
+        val spannable = android.text.SpannableString(fullText)
+        if (medStart >= 0) {
+            val primaryColor =
+                ContextCompat.getColor(requireContext(), edu.unikom.herbamedjabar.R.color.primary)
+            spannable.setSpan(
+                android.text.style.ForegroundColorSpan(primaryColor),
+                medStart,
+                medEnd,
+                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        binding.appTitleTextView.text = spannable
+
         parentFragmentManager.setFragmentResultListener("scan_again_request", this) { _, bundle ->
             if (bundle.getBoolean("open_camera")) {
                 checkCameraPermissionAndOpenCamera()
             }
         }
 
-        // Hubungkan tombol dengan fungsinya masing-masing
         binding.scanButton.setOnClickListener { checkCameraPermissionAndOpenCamera() }
         binding.btnGallery.setOnClickListener { galleryLauncher.launch("image/*") }
     }
 
     private fun observeViewModel() {
-        // Observer untuk navigasi
+        // Observe navigation
         viewModel.navigateToResult.observe(viewLifecycleOwner) { result ->
             result?.let {
-                // Panggil fungsi di MainActivity untuk menampilkan halaman hasil
-                (activity as? MainActivity)?.showResultFragment(it.imagePath, it.resultText)
-                viewModel.onNavigationComplete() // Reset state
+                (activity as? MainActivity)?.showResultFragment(it)
+                viewModel.onNavigationComplete()
             }
         }
 
-        // Observer untuk UI State (loading, error, etc)
+        // Observe UI state (loading, error, etc)
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Loading -> {
@@ -113,6 +142,7 @@ class ScanFragment : Fragment() {
                         processingDialog?.show(childFragmentManager, ProcessingDialogFragment.TAG)
                     }
                 }
+
                 is UiState.Success,
                 is UiState.Error -> {
                     processingDialog?.dismiss()
@@ -122,10 +152,18 @@ class ScanFragment : Fragment() {
                         }
                     }
                 }
+
                 else -> {
                     /* Idle */
                 }
             }
+        }
+
+        // Observe scanStats and update TextViews
+        viewModel.scanStats.observe(viewLifecycleOwner) { stats ->
+            binding.totalScanTextView.text = stats.total.toString()
+            binding.herbalScanTextView.text = stats.herbal.toString()
+            binding.nonHerbalScanTextView.text = stats.nonHerbal.toString()
         }
     }
 
@@ -138,12 +176,16 @@ class ScanFragment : Fragment() {
     private fun checkCameraPermissionAndOpenCamera() {
         when {
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) ==
-                    PackageManager.PERMISSION_GRANTED -> {
+                PackageManager.PERMISSION_GRANTED -> {
                 takePictureLauncher.launch(null)
             }
+
             else -> {
                 requestPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
         }
+    }
+    companion object {
+        private const val MED_SUBSTRING_LENGTH = 3
     }
 }

@@ -3,17 +3,17 @@ package edu.unikom.herbamedjabar.view
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.exceptions.ClearCredentialException
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.imageLoader
 import coil.load
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,6 +21,7 @@ import edu.unikom.herbamedjabar.R
 import edu.unikom.herbamedjabar.adapter.PostAdapter
 import edu.unikom.herbamedjabar.databinding.FragmentProfileBinding
 import edu.unikom.herbamedjabar.viewModel.ProfileViewModel
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
@@ -32,7 +33,8 @@ class ProfileFragment : Fragment() {
     private lateinit var postAdapter: PostAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
@@ -46,19 +48,7 @@ class ProfileFragment : Fragment() {
         observeViewModel()
 
         binding.btnLogout.setOnClickListener {
-            viewModel.logout()
-            viewLifecycleOwner.lifecycleScope.launch {
-                try {
-                    val credentialManager = CredentialManager.create(requireContext())
-                    val clearRequest = ClearCredentialStateRequest()
-                    credentialManager.clearCredentialState(clearRequest)
-                } catch (e: ClearCredentialException) {
-                    Log.e("ProfileFragment", "Gagal membersihkan kredensial: ${e.localizedMessage}")
-                } finally {
-                    startActivity(Intent(requireContext(), AuthActivity::class.java))
-                    activity?.finish()
-                }
-            }
+            handleLogout()
         }
     }
 
@@ -91,7 +81,7 @@ class ProfileFragment : Fragment() {
                 // Menggunakan tvFullName dari layout baru Anda
                 binding.tvUsername.text = it.displayName ?: "Nama Pengguna"
                 binding.tvEmail.text = it.email ?: "Email Pengguna"
-                binding.ivProfilePicture.load(it.photoUrl) {
+                binding.ivProfilePicture.load(it.photoUrl, binding.root.context.imageLoader) {
                     crossfade(true)
                     placeholder(R.drawable.ic_user_image_circular)
                     error(R.drawable.ic_user_image_circular)
@@ -117,29 +107,44 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updateBadgesVisibility(postCount: Int) {
-        binding.apply {
-            badge1.visibility = View.GONE
-            badge2.visibility = View.GONE
-            badge3.visibility = View.GONE
-            badge4.visibility = View.GONE
-
-            if (postCount >= 1) {
-                badge1.visibility = View.VISIBLE
-            }
-            if (postCount >= 5) {
-                badge2.visibility = View.VISIBLE
-            }
-            if (postCount >= 10) {
-                badge3.visibility = View.VISIBLE
-            }
-            if (postCount >= 20) {
-                badge4.visibility = View.VISIBLE
-            }
+        val badges = listOf(binding.badge1, binding.badge2, binding.badge3, binding.badge4)
+        val thresholds = listOf(BADGE_THRESHOLD_1, BADGE_THRESHOLD_2, BADGE_THRESHOLD_3, BADGE_THRESHOLD_4)
+        badges.forEachIndexed { i, badge ->
+            badge.visibility = if (postCount >= thresholds[i]) View.VISIBLE else View.GONE
         }
+    }
+
+    private fun handleLogout() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Konfirmasi Logout")
+            .setMessage("Apakah Anda yakin ingin logout?")
+            .setNegativeButton("Batal", null)
+            .setPositiveButton("Ya") { _, _ ->
+                viewModel.logout()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    try {
+                        val credentialManager = CredentialManager.create(requireContext())
+                        val clearRequest = ClearCredentialStateRequest()
+                        credentialManager.clearCredentialState(clearRequest)
+                    } catch (e: ClearCredentialException) {
+                        Log.e("ProfileFragment", "Gagal membersihkan kredensial: ${e.localizedMessage}")
+                    } finally {
+                        startActivity(Intent(requireContext(), AuthActivity::class.java))
+                        activity?.finish()
+                    }
+                }
+            }
+            .show()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+    companion object {
+        private const val BADGE_THRESHOLD_1 = 1
+        private const val BADGE_THRESHOLD_2 = 5
+        private const val BADGE_THRESHOLD_3 = 10
+        private const val BADGE_THRESHOLD_4 = 20
     }
 }

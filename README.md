@@ -28,6 +28,15 @@ HerbaMed Jabar adalah aplikasi Android yang dirancang untuk membantu pengguna me
     * [Coil](https://coil-kt.github.io/coil/) - untuk memuat gambar
     * [Lottie](https://lottiefiles.com/) - untuk animasi
 
+## 📊 Dokumentasi Sistem
+
+Lihat [DIAGRAMS.md](DIAGRAMS.md) untuk dokumentasi lengkap meliputi:
+* ERD (Entity Relationship Diagram)
+* Diagram Konteks
+* DFD (Data Flow Diagram) Level 0 dan Level 1
+* Flowmap alur sistem
+* Arsitektur aplikasi MVVM
+
 ## ⚙️ Instalasi dan Penggunaan
 
 1.  **Clone repositori ini:**

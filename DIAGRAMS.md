@@ -868,9 +868,13 @@ flowchart TB
 
 ## Narasi Arsitektur MVVM
 
-HerbaMed Jabar mengadopsi arsitektur **MVVM (Model-View-ViewModel)** yang dipadu dengan **Clean Architecture** untuk menciptakan struktur kode yang terorganisir, mudah diuji, dan dapat dipelihara. Dalam implementasinya, layer **View** (Activities dan Fragments) bertanggung jawab menampilkan UI dan menangkap interaksi pengguna, kemudian meneruskannya ke **ViewModel** yang mengelola state dan logika presentasi menggunakan LiveData untuk komunikasi reaktif. ViewModel tidak mengakses data secara langsung, melainkan mendelegasikan ke **Use Case** (seperti AnalyzePlantUseCase) yang mengenkapsulasi logika bisnis spesifik, lalu Use Case memanggil **Repository** sebagai abstraksi sumber data yang menyembunyikan detail implementasi apakah data berasal dari Room Database lokal, Firebase Firestore, atau API eksternal seperti Gemini AI dan Cloudinary. 
+HerbaMed Jabar mengadopsi arsitektur **MVVM (Model-View-ViewModel)** yang dipadu dengan **Clean Architecture** untuk menciptakan struktur kode yang terorganisir, mudah diuji, dan dapat dipelihara. Dalam implementasinya, layer **View** (Activities dan Fragments) bertanggung jawab menampilkan UI dan menangkap interaksi pengguna, kemudian meneruskannya ke **ViewModel** yang mengelola state dan logika presentasi menggunakan LiveData untuk komunikasi reaktif. 
 
-Dependency Injection dengan **Hilt/Dagger** memastikan semua komponen terhubung secara loose-coupled, memudahkan testing dan maintainability. Pemisahan concern yang jelas ini memungkinkan tim untuk bekerja pada layer berbeda secara paralel—misalnya, developer UI dapat fokus pada View layer tanpa perlu memahami detail implementasi database, sementara developer backend dapat mengoptimalkan Repository tanpa mengubah ViewModel. Pattern ini juga mendukung skalabilitas aplikasi, di mana penambahan fitur baru seperti analisis tanaman dengan model AI yang berbeda atau integrasi layanan cloud storage alternatif dapat dilakukan dengan hanya memodifikasi layer Repository tanpa menyentuh layer di atasnya, menjaga stabilitas dan konsistensi aplikasi.
+ViewModel tidak mengakses data secara langsung, melainkan mendelegasikan ke **Use Case** (seperti AnalyzePlantUseCase) yang mengenkapsulasi logika bisnis spesifik. Use Case kemudian memanggil **Repository** sebagai abstraksi sumber data yang menyembunyikan detail implementasi—apakah data berasal dari Room Database lokal, Firebase Firestore, atau API eksternal seperti Gemini AI dan Cloudinary. 
+
+Dependency Injection dengan **Hilt/Dagger** memastikan semua komponen terhubung secara loose-coupled, memudahkan testing dan maintainability. Pemisahan concern yang jelas ini memungkinkan tim untuk bekerja pada layer berbeda secara paralel. Developer UI dapat fokus pada View layer tanpa perlu memahami detail implementasi database, sementara developer backend dapat mengoptimalkan Repository tanpa mengubah ViewModel. 
+
+Pattern ini juga mendukung skalabilitas aplikasi yang baik. Penambahan fitur baru seperti analisis tanaman dengan model AI yang berbeda atau integrasi layanan cloud storage alternatif dapat dilakukan dengan hanya memodifikasi layer Repository tanpa menyentuh layer di atasnya, menjaga stabilitas dan konsistensi aplikasi.
 
 ---
 
@@ -1461,5 +1465,5 @@ flowchart TD
 ---
 
 **Dokumen ini dibuat berdasarkan analisis kode sumber HerbaMed Jabar**  
-**Versi: 2.0**  
+**Versi: 1.1**  
 **Tanggal: 2026-01-02**

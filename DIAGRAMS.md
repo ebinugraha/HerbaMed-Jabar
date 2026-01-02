@@ -8,6 +8,14 @@ Dokumen ini berisi analisis dan diagram sistem untuk aplikasi HerbaMed Jabar, se
 3. [DFD Level 0](#dfd-level-0)
 4. [DFD Level 1](#dfd-level-1)
 5. [Flowmap Sistem](#flowmap-sistem)
+6. [Narasi Arsitektur MVVM](#narasi-arsitektur-mvvm)
+7. [Diagram UML](#diagram-uml)
+   - [Class Diagram](#1-class-diagram)
+   - [Use Case Diagram](#2-use-case-diagram)
+   - [Activity Diagram - Proses Scan Tanaman](#3-activity-diagram---proses-scan-tanaman)
+   - [Sequence Diagram - Login dan Scan Tanaman](#4-sequence-diagram---login-dan-scan-tanaman)
+   - [Sequence Diagram - Posting ke Forum](#5-sequence-diagram---posting-ke-forum)
+   - [Activity Diagram - Manajemen Riwayat](#6-activity-diagram---manajemen-riwayat)
 
 ---
 
@@ -858,6 +866,600 @@ flowchart TB
 
 ---
 
+## Narasi Arsitektur MVVM
+
+HerbaMed Jabar mengadopsi arsitektur **MVVM (Model-View-ViewModel)** yang dipadu dengan **Clean Architecture** untuk menciptakan struktur kode yang terorganisir, mudah diuji, dan dapat dipelihara. Dalam implementasinya, layer **View** (Activities dan Fragments) bertanggung jawab menampilkan UI dan menangkap interaksi pengguna, kemudian meneruskannya ke **ViewModel** yang mengelola state dan logika presentasi menggunakan LiveData untuk komunikasi reaktif. ViewModel tidak mengakses data secara langsung, melainkan mendelegasikan ke **Use Case** (seperti AnalyzePlantUseCase) yang mengenkapsulasi logika bisnis spesifik, lalu Use Case memanggil **Repository** sebagai abstraksi sumber data yang menyembunyikan detail implementasi apakah data berasal dari Room Database lokal, Firebase Firestore, atau API eksternal seperti Gemini AI dan Cloudinary. 
+
+Dependency Injection dengan **Hilt/Dagger** memastikan semua komponen terhubung secara loose-coupled, memudahkan testing dan maintainability. Pemisahan concern yang jelas ini memungkinkan tim untuk bekerja pada layer berbeda secara paralel—misalnya, developer UI dapat fokus pada View layer tanpa perlu memahami detail implementasi database, sementara developer backend dapat mengoptimalkan Repository tanpa mengubah ViewModel. Pattern ini juga mendukung skalabilitas aplikasi, di mana penambahan fitur baru seperti analisis tanaman dengan model AI yang berbeda atau integrasi layanan cloud storage alternatif dapat dilakukan dengan hanya memodifikasi layer Repository tanpa menyentuh layer di atasnya, menjaga stabilitas dan konsistensi aplikasi.
+
+---
+
+## Diagram UML
+
+### 1. Class Diagram
+
+Class Diagram menunjukkan struktur kelas utama dalam aplikasi dan relasinya.
+
+```mermaid
+classDiagram
+    %% View Layer
+    class MainActivity {
+        -ActivityMainBinding binding
+        -FirebaseAuth auth
+        +onCreate(Bundle)
+        +setCurrentFragment(Fragment, Boolean)
+    }
+    
+    class ScanFragment {
+        -FragmentScanBinding binding
+        -ScanViewModel viewModel
+        -CameraProvider cameraProvider
+        +onViewCreated()
+        +captureImage()
+        +pickFromGallery()
+    }
+    
+    class ForumFragment {
+        -FragmentForumBinding binding
+        -ForumViewModel viewModel
+        -PostAdapter adapter
+        +onViewCreated()
+        +observePosts()
+    }
+    
+    class HistoryFragment {
+        -FragmentHistoryBinding binding
+        -HistoryViewModel viewModel
+        -HistoryAdapter adapter
+        +onViewCreated()
+        +observeHistory()
+    }
+    
+    class ProfileFragment {
+        -FragmentProfileBinding binding
+        -ProfileViewModel viewModel
+        +onViewCreated()
+        +observeUserData()
+    }
+    
+    %% ViewModel Layer
+    class ScanViewModel {
+        -AnalyzePlantUseCase analyzePlantUseCase
+        -LiveData~UiState~ uiState
+        -LiveData~AnalysisResult~ navigateToResult
+        +analyzeImage(Bitmap)
+        +onNavigationComplete()
+    }
+    
+    class ForumViewModel {
+        -PostRepository postRepository
+        -FirebaseAuth auth
+        -LiveData~List~Post~~ posts
+        +loadPosts()
+        +createPost(...)
+        +toggleLike(postId)
+        +deletePost(Post)
+    }
+    
+    class HistoryViewModel {
+        -PlantRepository plantRepository
+        -LiveData~List~ScanHistory~~ historyList
+        +loadHistory()
+        +deleteHistory(ScanHistory)
+    }
+    
+    class ProfileViewModel {
+        -PostRepository postRepository
+        -FirebaseAuth auth
+        -LiveData~List~Post~~ userPosts
+        +loadUserPosts()
+        +logout()
+    }
+    
+    class AuthViewModel {
+        -FirebaseAuth firebaseAuth
+        -LiveData~AuthState~ authState
+        +loginUser(email, password)
+        +registerUser(name, email, password, confirmPassword)
+        +signInWithGoogleToken(idToken)
+    }
+    
+    %% Use Case Layer
+    class AnalyzePlantUseCase {
+        -PlantRepository plantRepository
+        +invoke(Bitmap) Result~AnalysisResult~
+    }
+    
+    %% Repository Layer
+    class PlantRepository {
+        <<interface>>
+        +analyzePlant(Bitmap, String) AnalysisResult
+        +getAllHistory() Flow~List~ScanHistory~~
+        +deleteHistory(ScanHistory)
+    }
+    
+    class PlantRepositoryImpl {
+        -GenerativeModel generativeModel
+        -ScanHistoryDao scanHistoryDao
+        -Application application
+        +analyzePlant(Bitmap, String) AnalysisResult
+        +getAllHistory() Flow~List~ScanHistory~~
+        +deleteHistory(ScanHistory)
+        -saveBitmapToFile(Bitmap) String
+    }
+    
+    class PostRepository {
+        -FirebaseFirestore firestore
+        +getPosts() Flow~List~Post~~
+        +getPostsByUserId(userId) Flow~List~Post~~
+        +createPost(...)
+        +toggleLike(postId, userId)
+        +deletePost(Post)
+        -uploadImageToCloudinary(Uri) String
+    }
+    
+    %% Data Layer
+    class ScanHistoryDao {
+        <<interface>>
+        +insertHistory(ScanHistory)
+        +getAllHistory() Flow~List~ScanHistory~~
+        +deleteHistory(ScanHistory)
+    }
+    
+    class AppDatabase {
+        <<abstract>>
+        +scanHistoryDao() ScanHistoryDao
+    }
+    
+    %% Model/Entity Layer
+    class ScanHistory {
+        +int id
+        +String resultText
+        +String imagePath
+        +long timestamp
+    }
+    
+    class Post {
+        +String id
+        +String userId
+        +String username
+        +String userProfilePictureUrl
+        +String imageUrl
+        +String plantName
+        +String description
+        +long timestamp
+        +List~String~ likes
+        +String content
+        +String benefit
+        +String warning
+    }
+    
+    class AnalysisResult {
+        +String resultText
+        +String imagePath
+    }
+    
+    %% Relationships
+    MainActivity --> ScanFragment
+    MainActivity --> ForumFragment
+    MainActivity --> HistoryFragment
+    MainActivity --> ProfileFragment
+    
+    ScanFragment --> ScanViewModel
+    ForumFragment --> ForumViewModel
+    HistoryFragment --> HistoryViewModel
+    ProfileFragment --> ProfileViewModel
+    
+    ScanViewModel --> AnalyzePlantUseCase
+    AnalyzePlantUseCase --> PlantRepository
+    
+    ForumViewModel --> PostRepository
+    HistoryViewModel --> PlantRepository
+    ProfileViewModel --> PostRepository
+    AuthViewModel --> FirebaseAuth
+    
+    PlantRepository <|.. PlantRepositoryImpl
+    PlantRepositoryImpl --> ScanHistoryDao
+    PlantRepositoryImpl --> GenerativeModel
+    PostRepository --> FirebaseFirestore
+    
+    AppDatabase --> ScanHistoryDao
+    ScanHistoryDao --> ScanHistory
+    PostRepository --> Post
+    AnalyzePlantUseCase --> AnalysisResult
+```
+
+### 2. Use Case Diagram
+
+Use Case Diagram menggambarkan interaksi pengguna dengan sistem.
+
+```mermaid
+graph TB
+    subgraph System["Sistem HerbaMed Jabar"]
+        UC1((Registrasi/Login))
+        UC2((Scan Tanaman))
+        UC3((Lihat Hasil Scan))
+        UC4((Simpan Riwayat))
+        UC5((Lihat Riwayat))
+        UC6((Hapus Riwayat))
+        UC7((Buat Post Forum))
+        UC8((Lihat Feed Forum))
+        UC9((Like/Unlike Post))
+        UC10((Hapus Post))
+        UC11((Lihat Profil))
+        UC12((Logout))
+    end
+    
+    User([Pengguna])
+    GeminiAI[Google Gemini AI]
+    Firebase[Firebase Auth/Firestore]
+    Cloudinary[Cloudinary]
+    
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    User --> UC4
+    User --> UC5
+    User --> UC6
+    User --> UC7
+    User --> UC8
+    User --> UC9
+    User --> UC10
+    User --> UC11
+    User --> UC12
+    
+    UC1 -.-> Firebase
+    UC2 -.-> GeminiAI
+    UC4 -.-> UC3
+    UC7 -.-> Cloudinary
+    UC7 -.-> Firebase
+    UC8 -.-> Firebase
+    UC9 -.-> Firebase
+    UC10 -.-> Firebase
+    UC11 -.-> Firebase
+    UC12 -.-> Firebase
+    
+    style System fill:#E8F5E9
+```
+
+### 3. Activity Diagram - Proses Scan Tanaman
+
+Activity Diagram menunjukkan alur aktivitas untuk proses pemindaian tanaman.
+
+```mermaid
+flowchart TD
+    Start([Mulai])
+    OpenScan[Buka Tab Scan]
+    ChooseSource{Pilih Sumber<br/>Gambar}
+    
+    subgraph CameraFlow["Alur Kamera"]
+        OpenCamera[Buka Kamera]
+        TakePhoto[Ambil Foto]
+        PreviewPhoto[Preview Foto]
+    end
+    
+    subgraph GalleryFlow["Alur Galeri"]
+        OpenGallery[Buka Galeri]
+        SelectPhoto[Pilih Foto]
+    end
+    
+    ConfirmImage{Konfirmasi<br/>Gambar?}
+    ShowLoading[Tampilkan Loading Dialog]
+    
+    subgraph AIProcess["Proses AI"]
+        ConvertBitmap[Konversi ke Bitmap]
+        PreparePrompt[Siapkan Prompt]
+        CallGemini[Panggil Gemini AI API]
+        WaitResponse[Tunggu Response]
+        CheckSuccess{API<br/>Berhasil?}
+        RetryLogic{Retry < 3?}
+        ParseResult[Parse Hasil Markdown]
+    end
+    
+    subgraph SaveProcess["Proses Penyimpanan"]
+        SaveImage[Simpan Gambar ke<br/>Internal Storage]
+        CreateRecord[Buat Record ScanHistory]
+        SaveToDB[Simpan ke Room DB]
+    end
+    
+    ShowResult[Tampilkan Hasil<br/>di ResultFragment]
+    ShowError[Tampilkan Error Message]
+    End([Selesai])
+    
+    Start --> OpenScan
+    OpenScan --> ChooseSource
+    
+    ChooseSource -->|Kamera| OpenCamera
+    ChooseSource -->|Galeri| OpenGallery
+    
+    OpenCamera --> TakePhoto
+    TakePhoto --> PreviewPhoto
+    PreviewPhoto --> ConfirmImage
+    
+    OpenGallery --> SelectPhoto
+    SelectPhoto --> ConfirmImage
+    
+    ConfirmImage -->|Ya| ShowLoading
+    ConfirmImage -->|Tidak| ChooseSource
+    
+    ShowLoading --> ConvertBitmap
+    ConvertBitmap --> PreparePrompt
+    PreparePrompt --> CallGemini
+    CallGemini --> WaitResponse
+    WaitResponse --> CheckSuccess
+    
+    CheckSuccess -->|Berhasil| ParseResult
+    CheckSuccess -->|Gagal| RetryLogic
+    
+    RetryLogic -->|Ya| CallGemini
+    RetryLogic -->|Tidak| ShowError
+    
+    ParseResult --> SaveImage
+    SaveImage --> CreateRecord
+    CreateRecord --> SaveToDB
+    SaveToDB --> ShowResult
+    
+    ShowResult --> End
+    ShowError --> End
+    
+    style AIProcess fill:#FFF9C4
+    style SaveProcess fill:#C8E6C9
+    style CameraFlow fill:#E1BEE7
+    style GalleryFlow fill:#E1BEE7
+```
+
+### 4. Sequence Diagram - Login dan Scan Tanaman
+
+Sequence Diagram menunjukkan interaksi antar objek dalam proses login dan scan tanaman.
+
+```mermaid
+sequenceDiagram
+    actor User as Pengguna
+    participant LF as LoginFragment
+    participant AVM as AuthViewModel
+    participant FA as FirebaseAuth
+    participant MA as MainActivity
+    participant SF as ScanFragment
+    participant SVM as ScanViewModel
+    participant UC as AnalyzePlantUseCase
+    participant PR as PlantRepository
+    participant GA as Gemini AI
+    participant DAO as ScanHistoryDao
+    participant RF as ResultFragment
+    
+    %% Login Flow
+    rect rgb(230, 245, 255)
+        Note over User,FA: Proses Autentikasi
+        User->>LF: Input email & password
+        LF->>AVM: loginUser(email, password)
+        activate AVM
+        AVM->>FA: signInWithEmailAndPassword()
+        activate FA
+        FA-->>AVM: AuthResult
+        deactivate FA
+        AVM-->>LF: AuthState.Authenticated
+        deactivate AVM
+        LF->>MA: Navigate to MainActivity
+        activate MA
+        MA->>MA: Check auth status
+        MA->>SF: Load ScanFragment
+        deactivate MA
+    end
+    
+    %% Scan Flow
+    rect rgb(255, 245, 230)
+        Note over User,RF: Proses Pemindaian Tanaman
+        User->>SF: Klik tombol kamera
+        SF->>SF: Open camera
+        User->>SF: Ambil foto tanaman
+        SF->>SF: Convert to Bitmap
+        User->>SF: Konfirmasi scan
+        SF->>SVM: analyzeImage(bitmap)
+        activate SVM
+        SVM->>SVM: Set UiState.Loading
+        SVM->>UC: invoke(bitmap)
+        activate UC
+        UC->>PR: analyzePlant(bitmap, prompt)
+        activate PR
+        PR->>GA: generateContent(image + prompt)
+        activate GA
+        
+        alt API Success
+            GA-->>PR: Response text
+            deactivate GA
+            PR->>PR: saveBitmapToFile(bitmap)
+            PR->>DAO: insertHistory(scanHistory)
+            activate DAO
+            DAO-->>PR: Success
+            deactivate DAO
+            PR-->>UC: AnalysisResult(text, path)
+            deactivate PR
+            UC-->>SVM: Result.Success(AnalysisResult)
+            deactivate UC
+            SVM->>SVM: Set UiState.Success
+            SVM-->>SF: navigateToResult
+            deactivate SVM
+            SF->>RF: Navigate with result
+            RF->>RF: Display result
+            RF-->>User: Tampilkan info tanaman
+        else API Failed (Retry)
+            GA-->>PR: Error
+            PR->>GA: Retry request (max 3x)
+            GA-->>PR: Response text
+            PR-->>UC: AnalysisResult
+            UC-->>SVM: Result.Success
+            SVM-->>SF: navigateToResult
+            SF->>RF: Navigate with result
+            RF-->>User: Tampilkan info tanaman
+        else API Failed (Max Retry)
+            GA-->>PR: Error
+            PR-->>UC: Exception
+            UC-->>SVM: Result.Failure
+            SVM->>SVM: Set UiState.Error
+            SVM-->>SF: Error message
+            SF-->>User: Tampilkan error
+        end
+    end
+```
+
+### 5. Sequence Diagram - Posting ke Forum
+
+Sequence Diagram untuk proses membuat post di forum.
+
+```mermaid
+sequenceDiagram
+    actor User as Pengguna
+    participant RF as ResultFragment
+    participant FVM as ForumViewModel
+    participant FA as FirebaseAuth
+    participant PR as PostRepository
+    participant CL as Cloudinary
+    participant FS as Firestore
+    participant FF as ForumFragment
+    
+    rect rgb(230, 255, 230)
+        Note over User,FF: Proses Posting ke Forum
+        User->>RF: Klik "Bagikan ke Forum"
+        RF->>RF: Show dialog form
+        User->>RF: Input data (nama tanaman, deskripsi)
+        User->>RF: Klik Submit
+        
+        RF->>FVM: createPost(userId, username, ...)
+        activate FVM
+        
+        FVM->>FA: getCurrentUser()
+        activate FA
+        FA-->>FVM: User data (profile pic URL)
+        deactivate FA
+        
+        FVM->>PR: createPost(userId, username, imageUri, ...)
+        activate PR
+        
+        PR->>CL: upload(imageUri)
+        activate CL
+        CL-->>PR: imageUrl (secure_url)
+        deactivate CL
+        
+        PR->>PR: Create Post object
+        PR->>FS: collection("posts").document(postId).set(post)
+        activate FS
+        FS-->>PR: Success
+        deactivate FS
+        
+        PR-->>FVM: Success
+        deactivate PR
+        
+        FVM-->>RF: Post created
+        deactivate FVM
+        
+        RF-->>User: Tampilkan success message
+        RF->>FF: Navigate to Forum
+        
+        FF->>FVM: observePosts()
+        activate FVM
+        FVM->>PR: getPosts()
+        activate PR
+        PR->>FS: addSnapshotListener (realtime)
+        activate FS
+        FS-->>PR: List<Post> (realtime updates)
+        deactivate FS
+        PR-->>FVM: Flow<List<Post>>
+        deactivate PR
+        FVM-->>FF: LiveData<List<Post>>
+        deactivate FVM
+        
+        FF->>FF: Update RecyclerView
+        FF-->>User: Tampilkan feed dengan post baru
+    end
+```
+
+### 6. Activity Diagram - Manajemen Riwayat
+
+Activity Diagram untuk melihat dan mengelola riwayat pemindaian.
+
+```mermaid
+flowchart TD
+    Start([Mulai])
+    ClickHistory[Klik Tab History]
+    
+    subgraph LoadData["Load Data"]
+        QueryDB[Query Room Database]
+        CheckEmpty{Ada Data?}
+        ShowEmpty[Tampilkan Empty State<br/>"Belum ada riwayat"]
+        DisplayList[Tampilkan List Riwayat<br/>Urut berdasarkan timestamp]
+    end
+    
+    WaitAction{Aksi User}
+    
+    subgraph ViewDetail["Lihat Detail"]
+        SelectItem[Pilih Item dari List]
+        LoadDetail[Load Detail dari DB]
+        LoadImageFile[Load Gambar dari<br/>Internal Storage]
+        ShowDetail[Tampilkan Detail<br/>Hasil Analisis]
+    end
+    
+    subgraph DeleteFlow["Hapus Riwayat"]
+        ClickDelete[Klik Tombol Hapus]
+        ShowConfirm{Konfirmasi<br/>Hapus?}
+        DeleteFromDB[Hapus dari Room DB]
+        DeleteImage[Hapus File Gambar]
+        RefreshList[Refresh List]
+        ShowSuccess[Tampilkan Toast:<br/>"Berhasil dihapus"]
+    end
+    
+    subgraph ShareFlow["Bagikan ke Forum"]
+        ClickShare[Klik Tombol Bagikan]
+        NavigateForm[Navigate ke Form Post]
+        FillForm[Form Auto-fill dengan<br/>Data dari Riwayat]
+    end
+    
+    BackToList[Kembali ke List]
+    End([Selesai])
+    
+    Start --> ClickHistory
+    ClickHistory --> QueryDB
+    QueryDB --> CheckEmpty
+    
+    CheckEmpty -->|Tidak| ShowEmpty
+    CheckEmpty -->|Ya| DisplayList
+    
+    ShowEmpty --> End
+    DisplayList --> WaitAction
+    
+    WaitAction -->|Lihat Detail| SelectItem
+    WaitAction -->|Kembali| End
+    
+    SelectItem --> LoadDetail
+    LoadDetail --> LoadImageFile
+    LoadImageFile --> ShowDetail
+    
+    ShowDetail --> WaitAction
+    ShowDetail -->|Hapus| ClickDelete
+    ShowDetail -->|Bagikan| ClickShare
+    ShowDetail -->|Kembali| BackToList
+    
+    ClickDelete --> ShowConfirm
+    ShowConfirm -->|Ya| DeleteFromDB
+    ShowConfirm -->|Tidak| ShowDetail
+    DeleteFromDB --> DeleteImage
+    DeleteImage --> RefreshList
+    RefreshList --> ShowSuccess
+    ShowSuccess --> BackToList
+    
+    ClickShare --> NavigateForm
+    NavigateForm --> FillForm
+    FillForm --> End
+    
+    BackToList --> DisplayList
+    
+    style LoadData fill:#E3F2FD
+    style ViewDetail fill:#F3E5F5
+    style DeleteFlow fill:#FFEBEE
+    style ShareFlow fill:#E8F5E9
+```
+
+---
+
 **Dokumen ini dibuat berdasarkan analisis kode sumber HerbaMed Jabar**  
-**Versi: 1.0**  
-**Tanggal: 2025-12-15**
+**Versi: 2.0**  
+**Tanggal: 2026-01-02**

@@ -16,6 +16,7 @@ Dokumen ini berisi analisis dan diagram sistem untuk aplikasi HerbaMed Jabar, se
    - [Sequence Diagram - Login dan Scan Tanaman](#4-sequence-diagram---login-dan-scan-tanaman)
    - [Sequence Diagram - Posting ke Forum](#5-sequence-diagram---posting-ke-forum)
    - [Activity Diagram - Manajemen Riwayat](#6-activity-diagram---manajemen-riwayat)
+8. [Struktur Folder Proyek](#struktur-folder-proyek)
 
 ---
 
@@ -1464,6 +1465,136 @@ flowchart TD
 
 ---
 
+## Struktur Folder Proyek
+
+Struktur folder pada path `app/src/main/java/edu/unikom/herbamedjabar` menunjukkan organisasi kode berdasarkan prinsip Clean Architecture dan MVVM.
+
+```
+app/src/main/java/edu/unikom/herbamedjabar/
+│
+├── HerbaAppApplication.kt          # Application class utama
+│
+├── adapter/                         # RecyclerView Adapters
+│   ├── HistoryAdapter.kt           # Adapter untuk list riwayat
+│   └── PostAdapter.kt              # Adapter untuk list post forum
+│
+├── dao/                            # Data Access Objects (Room)
+│   └── ScanHistoryDao.kt           # DAO untuk scan history
+│
+├── data/                           # Data Models/Entities
+│   ├── Post.kt                     # Model untuk post forum
+│   └── ScanHistory.kt              # Model untuk riwayat scan
+│
+├── db/                             # Database Configuration
+│   └── AppDatabase.kt              # Room Database configuration
+│
+├── di/                             # Dependency Injection
+│   └── AppModule.kt                # Hilt module untuk DI
+│
+├── repository/                     # Repository Layer
+│   ├── PlantRepository.kt          # Interface repository tanaman
+│   └── PostRepository.kt           # Repository untuk forum posts
+│
+├── useCase/                        # Business Logic Layer
+│   └── AnalyzePlantUseCase.kt      # Use case untuk analisis tanaman
+│
+├── view/                           # UI Layer (Activities & Fragments)
+│   ├── AuthActivity.kt             # Activity untuk autentikasi
+│   ├── SplashActivity.kt           # Splash screen
+│   ├── MainActivity.kt             # Main activity dengan bottom nav
+│   ├── LoginFragment.kt            # Fragment login
+│   ├── RegisterFragment.kt         # Fragment registrasi
+│   ├── ScanFragment.kt             # Fragment scan tanaman
+│   ├── ResultFragment.kt           # Fragment hasil scan
+│   ├── ForumFragment.kt            # Fragment forum
+│   ├── HistoryFragment.kt          # Fragment riwayat
+│   ├── HistoryDetailFragment.kt    # Fragment detail riwayat
+│   ├── ProfileFragment.kt          # Fragment profil user
+│   └── ProcessingDialogFragment.kt # Dialog loading
+│
+└── viewModel/                      # ViewModel Layer
+    ├── AuthViewModel.kt            # ViewModel autentikasi
+    ├── ScanViewModel.kt            # ViewModel scan
+    ├── ResultViewModel.kt          # ViewModel hasil
+    ├── ForumViewModel.kt           # ViewModel forum
+    ├── HistoryViewModel.kt         # ViewModel riwayat
+    ├── HistoryDetailViewModel.kt   # ViewModel detail riwayat
+    └── ProfileViewModel.kt         # ViewModel profil
+```
+
+### Diagram Struktur Folder (Mermaid)
+
+```mermaid
+graph TD
+    Root[herbamedjabar/]
+    
+    Root --> App[HerbaAppApplication.kt]
+    
+    Root --> Adapter[adapter/]
+    Adapter --> HistoryAdapter[HistoryAdapter.kt]
+    Adapter --> PostAdapter[PostAdapter.kt]
+    
+    Root --> DAO[dao/]
+    DAO --> ScanHistoryDao[ScanHistoryDao.kt]
+    
+    Root --> Data[data/]
+    Data --> Post[Post.kt]
+    Data --> ScanHistory[ScanHistory.kt]
+    
+    Root --> DB[db/]
+    DB --> AppDatabase[AppDatabase.kt]
+    
+    Root --> DI[di/]
+    DI --> AppModule[AppModule.kt]
+    
+    Root --> Repo[repository/]
+    Repo --> PlantRepo[PlantRepository.kt]
+    Repo --> PostRepo[PostRepository.kt]
+    
+    Root --> UseCase[useCase/]
+    UseCase --> AnalyzeUC[AnalyzePlantUseCase.kt]
+    
+    Root --> View[view/]
+    View --> AuthAct[AuthActivity.kt]
+    View --> SplashAct[SplashActivity.kt]
+    View --> MainActivity[MainActivity.kt]
+    View --> LoginFrag[LoginFragment.kt]
+    View --> RegisterFrag[RegisterFragment.kt]
+    View --> ScanFrag[ScanFragment.kt]
+    View --> ResultFrag[ResultFragment.kt]
+    View --> ForumFrag[ForumFragment.kt]
+    View --> HistoryFrag[HistoryFragment.kt]
+    View --> HistDetailFrag[HistoryDetailFragment.kt]
+    View --> ProfileFrag[ProfileFragment.kt]
+    View --> ProcessDlg[ProcessingDialogFragment.kt]
+    
+    Root --> VM[viewModel/]
+    VM --> AuthVM[AuthViewModel.kt]
+    VM --> ScanVM[ScanViewModel.kt]
+    VM --> ResultVM[ResultViewModel.kt]
+    VM --> ForumVM[ForumViewModel.kt]
+    VM --> HistoryVM[HistoryViewModel.kt]
+    VM --> HistDetailVM[HistoryDetailViewModel.kt]
+    VM --> ProfileVM[ProfileViewModel.kt]
+    
+    style Root fill:#4CAF50,color:#fff
+    style Adapter fill:#E8F5E9
+    style DAO fill:#E8F5E9
+    style Data fill:#E8F5E9
+    style DB fill:#E8F5E9
+    style DI fill:#FFF9C4
+    style Repo fill:#BBDEFB
+    style UseCase fill:#C5CAE9
+    style View fill:#F8BBD0
+    style VM fill:#D1C4E9
+```
+
+**Penjelasan Struktur:**
+
+Struktur folder ini mengikuti pola Clean Architecture dengan pemisahan yang jelas antara layer presentasi (view, viewModel), domain (useCase), dan data (repository, dao, db). Layer `di` menyediakan dependency injection, `adapter` untuk UI components, dan `data` berisi model entities yang digunakan di seluruh aplikasi.
+
+---
+
 **Dokumen ini dibuat berdasarkan analisis kode sumber HerbaMed Jabar**  
-**Versi: 1.1**  
-**Tanggal: 2026-01-02**
+**Versi: 1.2**  
+**Tanggal: 2026-01-25**
